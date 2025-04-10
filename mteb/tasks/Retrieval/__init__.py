@@ -179,6 +179,7 @@ from .pol.QuoraPLRetrieval import *
 from .pol.SCIDOCSPLRetrieval import *
 from .pol.SciFactPLRetrieval import *
 from .pol.TRECCOVIDPLRetrieval import *
+from .RTEBRetrieval import *
 from .rus.RiaNewsRetrieval import *
 from .rus.RuBQRetrieval import *
 from .slk.SKQuadRetrieval import *
