@@ -3,13 +3,13 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING, Any
 
-from ebr.core.base import APIEmbeddingModel
+from ..core.base.model import APIEmbeddingModel  # Corrected path
 
-if os.environ["USE_RTEB"]:
-    from ebr.core.meta import ModelMeta
+if os.environ.get("USE_RTEB"):  # Use .get() to avoid KeyError
+    from ..core.meta import ModelMeta  # Corrected path
 else:
     from mteb.model_meta import ModelMeta
-from ebr.utils.lazy_import import LazyImport
+from ..utils.lazy_import import LazyImport  # Corrected path
 
 if TYPE_CHECKING:
     import voyageai

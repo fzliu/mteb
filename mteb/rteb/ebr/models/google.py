@@ -5,10 +5,10 @@ import os
 import time
 from typing import Any
 
-from ebr.core.base import APIEmbeddingModel
+from ..core.base.model import APIEmbeddingModel  # Corrected path
 
-if os.environ["USE_RTEB"]:
-    from ebr.core.meta import ModelMeta
+if os.environ.get("USE_RTEB"):  # Use .get() to avoid KeyError
+    from ..core.meta import ModelMeta  # Corrected path
 else:
     from mteb.model_meta import ModelMeta
 

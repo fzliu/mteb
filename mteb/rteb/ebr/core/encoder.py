@@ -4,10 +4,11 @@ import json
 import logging
 import os
 
-from ebr.core.base import EmbeddingModel
-from ebr.utils.data import JSONLDataset
-from ebr.utils.distributed import gather_list
 from pytorch_lightning import LightningModule
+
+from ..utils.data import JSONLDataset
+from ..utils.distributed import gather_list
+from .base.model import EmbeddingModel
 
 logger = logging.getLogger(__name__)
 

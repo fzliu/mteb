@@ -1,16 +1,15 @@
 from __future__ import annotations
 
-from ebr.core.base import EmbeddingModel
-from ebr.models.bgem3 import *
-from ebr.models.cohere import *
-from ebr.models.google import *
-from ebr.models.gritlm import *
-from ebr.models.openai import *
-from ebr.models.sentence_transformers import *
-from ebr.models.voyageai import *
-from ebr.utils.lazy_import import LazyImport
-
-from mteb.model_meta import ModelMeta, model_id
+from ..core.base.model import EmbeddingModel
+from ..core.meta import ModelMeta, model_id  # Use local ebr ModelMeta
+from ..utils.lazy_import import LazyImport
+from .bgem3 import *
+from .cohere import *
+from .google import *
+from .gritlm import *
+from .openai import *
+from .sentence_transformers import *
+from .voyageai import *
 
 MODEL_REGISTRY: dict[str, ModelMeta] = {}
 for name in dir():

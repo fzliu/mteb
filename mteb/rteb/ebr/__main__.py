@@ -8,11 +8,13 @@ from collections import defaultdict
 from pathlib import Path
 
 import pytorch_lightning as pl
-from ebr.core import Encoder, Retriever
-from ebr.datasets import DATASET_REGISTRY, DatasetMeta
-from ebr.models import MODEL_REGISTRY, ModelMeta
-from ebr.retrieve import run_retrieve_task
 from pytorch_lightning.strategies.ddp import DDPStrategy
+
+from .core.encoder import Encoder
+from .core.retriever import Retriever
+from .datasets import DATASET_REGISTRY, DatasetMeta
+from .models import MODEL_REGISTRY, ModelMeta
+from .retrieve import run_retrieve_task
 
 logger = logging.getLogger(__name__)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

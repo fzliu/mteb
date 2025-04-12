@@ -4,10 +4,11 @@ import json
 import os
 from functools import cache
 
-from ebr.core.base import RetrievalDataset
-from ebr.core.meta import DatasetMeta
-from ebr.utils.data import JSONLDataset
 from torch.utils.data import Dataset
+
+from ..core.base.dataset import RetrievalDataset
+from ..core.meta import DatasetMeta
+from ..utils.data import JSONLDataset
 
 
 class TextRetrievalDataset(RetrievalDataset):

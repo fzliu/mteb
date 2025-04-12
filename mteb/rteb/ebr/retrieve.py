@@ -2,15 +2,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging  # Import the logging module
 import os
 from pathlib import Path
 
 import pytorch_lightning as pl
 from beir.retrieval.evaluation import EvaluateRetrieval
-from ebr.core import Encoder
-from ebr.core.data import RetrieveDataModule
-from ebr.core.meta import DatasetMeta
-from termcolor import colored
+
+from .core.data import RetrieveDataModule
+from .core.encoder import Encoder
+from .core.meta import DatasetMeta
+
+logger = logging.getLogger(__name__)  # Initialize the logger
 
 CORPUS_EMBD_FILENAME = "corpus_embds.jsonl"
 QUERIES_EMBD_FILENAME = "queries_embds.jsonl"
@@ -78,8 +81,8 @@ def run_retrieve_task(
     )
     if trainer.is_global_zero:
         dm.prepare_data()
-        trainer.print("Queries size:", len(dm.dataset.queries))
-        trainer.print("Corpus size:", len(dm.dataset.corpus))
+        logger.info(f"Queries size: {len(dm.dataset.queries)}")
+        logger.info(f"Corpus size: {len(dm.dataset.corpus)}")
 
     trainer.strategy.barrier()
 
@@ -87,13 +90,11 @@ def run_retrieve_task(
         len(dm.dataset.queries) < trainer.num_devices
         or len(dm.dataset.corpus) < trainer.num_devices
     ):
-        trainer.print(
-            colored("Skipping the task due to too few queries / documents.", "red")
-        )
+        logger.warning("Skipping the task due to too few queries / documents.")
         return {}
 
     if len(dm.dataset.queries) >= 1e6:
-        trainer.print(colored("Skipping the task due to too many queries.", "red"))
+        logger.warning("Skipping the task due to too many queries.")
         return {}
 
     if dataset_name == "bm25":
@@ -105,17 +106,17 @@ def run_retrieve_task(
 
     else:
         # Compute the query embeddings
-        trainer.print(colored("Encode queries", "yellow"))
+        logger.info("Encode queries")
         encoder.is_query = True
         encoder.in_memory = len(dm.dataset.queries) < args.embd_in_memory_threshold
         encoder.save_file = os.path.join(task_save_path, QUERIES_EMBD_FILENAME)
         if args.load_embds and encoder.embd_files_exist(trainer.num_devices):
             queries_embds_files = encoder.get_embd_files(trainer.num_devices)
-            trainer.print(f"Embedding files exist: {queries_embds_files}")
+            logger.info(f"Embedding files exist: {queries_embds_files}")
             dm.set_queries_embds(queries_embds_files=queries_embds_files)
         else:
-            trainer.print(f"in_memory = {encoder.in_memory}")
-            trainer.print(f"save_file = {encoder.save_file}")
+            logger.info(f"in_memory = {encoder.in_memory}")
+            logger.info(f"save_file = {encoder.save_file}")
             trainer.predict(model=encoder, dataloaders=dm.queries_dataloader())
             # Set the query embeddings
             queries_embds_files = encoder.get_embd_files()
@@ -124,17 +125,17 @@ def run_retrieve_task(
             )
 
         # Compute the corpus embeddings
-        trainer.print(colored("Encode corpus", "yellow"))
+        logger.info("Encode corpus")
         encoder.is_query = False
         encoder.save_file = os.path.join(task_save_path, CORPUS_EMBD_FILENAME)
         encoder.in_memory = len(dm.dataset.corpus) < args.embd_in_memory_threshold
         if args.load_embds and encoder.embd_files_exist(trainer.num_devices):
             corpus_embds_files = encoder.get_embd_files(trainer.num_devices)
-            trainer.print(f"Embedding files exist: {corpus_embds_files}")
+            logger.info(f"Embedding files exist: {corpus_embds_files}")
             dm.set_corpus_embds(corpus_embds_files=corpus_embds_files)
         else:
-            trainer.print(f"in_memory = {encoder.in_memory}")
-            trainer.print(f"save_file = {encoder.save_file}")
+            logger.info(f"in_memory = {encoder.in_memory}")
+            logger.info(f"save_file = {encoder.save_file}")
             trainer.predict(model=encoder, dataloaders=dm.corpus_dataloader())
             # Set the corpus embeddings
             corpus_embds_files = encoder.get_embd_files()
@@ -143,7 +144,7 @@ def run_retrieve_task(
             )
 
         # Run retriever
-        trainer.print(colored("Retrieve", "yellow"))
+        logger.info("Retrieve")
         retriever.corpus_embd_dataloader = dm.corpus_embd_dataloader()
         retriever.in_memory = len(dm.dataset.queries) < args.embd_in_memory_threshold
         retriever.save_file = os.path.join(task_save_path, RETRIEVE_PRED_FILENAME)
@@ -158,12 +159,12 @@ def run_retrieve_task(
     # Run evaluation
     if trainer.is_global_zero:
         scores = run_retrieve_evaluation(dm.dataset.relevance, retriever.prediction)
-        trainer.print("-" * 40)
-        trainer.print("Dataset:", colored(f"{dataset_name}", "red"))
-        trainer.print("Model:", colored(f"{encoder.model.model_name}", "red"))
-        trainer.print("Save path:", colored(task_save_path, "yellow"))
-        trainer.print("Retrieval evaluation:")
-        trainer.print(scores)
+        logger.info("-" * 40)
+        logger.info(f"Dataset: {dataset_name}")
+        logger.info(f"Model: {encoder.model.model_name}")
+        logger.info(f"Save path: {task_save_path}")
+        logger.info("Retrieval evaluation:")
+        logger.info(scores)  # Log the scores dictionary
         scores |= {
             "model_name": encoder.model.model_name,
             "embd_dim": encoder.model.embd_dim,
@@ -171,7 +172,9 @@ def run_retrieve_task(
         }
         with open(os.path.join(task_save_path, RETRIEVE_EVAL_FILENAME), "w") as f:
             json.dump(scores, f)
-        trainer.print(os.path.join(task_save_path, RETRIEVE_EVAL_FILENAME))
+        logger.info(
+            f"Results saved to: {os.path.join(task_save_path, RETRIEVE_EVAL_FILENAME)}"
+        )
         return scores
 
     return

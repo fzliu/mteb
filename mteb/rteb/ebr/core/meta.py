@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from typing import Any, Callable, Literal
 
-from ebr.core.base import EmbeddingModel, RetrievalDataset
 from pydantic import BaseModel, ConfigDict
+
+from .base.dataset import RetrievalDataset
+from .base.model import EmbeddingModel
 
 # Tier 0: fully open (documents, queries, relevance)
 # Tier 1: documents and queries released

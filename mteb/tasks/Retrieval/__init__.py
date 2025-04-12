@@ -179,7 +179,14 @@ from .pol.QuoraPLRetrieval import *
 from .pol.SCIDOCSPLRetrieval import *
 from .pol.SciFactPLRetrieval import *
 from .pol.TRECCOVIDPLRetrieval import *
-from .RTEBRetrieval import *
+
+# Only import concrete RTEB task subclasses
+from .RTEBLegalQuADTask import (
+    RTEBLegalQuAD as RTEBLegalQuAD,
+)  # Import from the new dedicated file
+
+# Add other concrete RTEB task imports here if created, e.g.:
+# from .RTEBNFCorpusTask import RTEBNFCorpus
 from .rus.RiaNewsRetrieval import *
 from .rus.RuBQRetrieval import *
 from .slk.SKQuadRetrieval import *

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import os
 
-from ebr.core.base import EmbeddingModel
-from ebr.utils.lazy_import import LazyImport
+from ..core.base.model import EmbeddingModel  # Corrected path
+from ..utils.lazy_import import LazyImport  # Corrected path
 
-if os.environ["USE_RTEB"]:
-    from ebr.core.meta import ModelMeta
+if os.environ.get("USE_RTEB"):  # Use .get() to avoid KeyError
+    from ..core.meta import ModelMeta  # Corrected path
 else:
     from mteb.model_meta import ModelMeta
 

@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import torch
-from ebr.datasets import get_retrieval_dataset
-from ebr.utils.data import EmptyDataset, JSONLDataset
 from pytorch_lightning import LightningDataModule
+
+from ..datasets import get_retrieval_dataset
+from ..utils.data import EmptyDataset, JSONLDataset
 
 
 class EmbeddingDataCollator:

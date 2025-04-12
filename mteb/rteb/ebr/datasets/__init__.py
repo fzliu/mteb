@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from ebr.core.base import RetrievalDataset
-from ebr.core.meta import DatasetMeta, dataset_id
-from ebr.datasets.text import *
-from ebr.utils.lazy_import import LazyImport
+from ..core.base.dataset import RetrievalDataset
+from ..core.meta import DatasetMeta, dataset_id
+from ..utils.lazy_import import LazyImport
+from .text import *
 
 DATASET_REGISTRY: dict[str, DatasetMeta] = {}
 for name in dir():
