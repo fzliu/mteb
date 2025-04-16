@@ -17,6 +17,7 @@ import torch.distributed  # Needed for replicated logic
 # MTEB Imports
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
+from mteb.encoder_interface import PromptType
 from mteb.load_results.task_results import ScoresDict
 
 from .ebr.core.data import RetrieveDataModule  # Need this to load data
@@ -339,7 +340,7 @@ class RTEBTaskRunner:
                 # Pass task_name as required by some MTEB encoders (like VoyageWrapper)
                 # Use the wrapper's encode method, which calls the underlying model's encode
                 batch_embeddings = encoder_wrapper.encode(
-                    sentences, task_name=task_name
+                    sentences, task_name=task_name, prompt_type=PromptType.passage
                 )
                 if batch_embeddings.shape[0] != len(ids):
                     logger.error(
@@ -433,7 +434,10 @@ class RTEBTaskRunner:
             f"Starting RTEB evaluation via Manual Runner: {task_metadata.name} ({rteb_dataset_name})..."
         )
 
-        model_name = getattr(model, "model_name", "mteb_wrapped_model")
+        if hasattr(model, "mteb_model_meta"):
+            model_name = model.mteb_model_meta.name
+        else:
+            model_name = getattr(model, "model_name", "mteb_wrapped_model")
         # Pass save/load flags from kwargs if provided, otherwise default to False
         save_embds_flag = kwargs.get(
             "save_embeddings", False
