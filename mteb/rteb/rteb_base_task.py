@@ -316,6 +316,7 @@ class RTEBTaskRunner:
         encoder_wrapper: MTEBToRTEBEncoderWrapper,
         dataloader: torch.utils.data.DataLoader,
         task_name: str,  # Add task_name argument
+        prompt_type: PromptType,
     ) -> dict[str, torch.Tensor]:
         """Manually encodes data using the wrapper."""
         embeddings_dict = {}
@@ -340,7 +341,7 @@ class RTEBTaskRunner:
                 # Pass task_name as required by some MTEB encoders (like VoyageWrapper)
                 # Use the wrapper's encode method, which calls the underlying model's encode
                 batch_embeddings = encoder_wrapper.encode(
-                    sentences, task_name=task_name, prompt_type=PromptType.passage
+                    sentences, task_name=task_name, prompt_type=prompt_type
                 )
                 if batch_embeddings.shape[0] != len(ids):
                     logger.error(
@@ -506,11 +507,19 @@ class RTEBTaskRunner:
             }
 
         # 2. Manually Encode Queries and Corpus
+        logger.info("Encoding queries")
         query_embeddings = RTEBTaskRunner._encode_data(
-            rteb_encoder, dm.queries_dataloader(), task_name=task_metadata.name
+            rteb_encoder,
+            dm.queries_dataloader(),
+            task_name=task_metadata.name,
+            prompt_type=PromptType.query,
         )
+        logger.info("Encoding corpus")
         corpus_embeddings = RTEBTaskRunner._encode_data(
-            rteb_encoder, dm.corpus_dataloader(), task_name=task_metadata.name
+            rteb_encoder,
+            dm.corpus_dataloader(),
+            task_name=task_metadata.name,
+            prompt_type=PromptType.passage,
         )
 
         if not query_embeddings or not corpus_embeddings:
