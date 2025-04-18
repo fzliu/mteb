@@ -19,14 +19,13 @@ from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.encoder_interface import PromptType
 from mteb.load_results.task_results import ScoresDict
-
-from .ebr.core.data import RetrieveDataModule  # Need this to load data
-from .ebr.core.retriever import Retriever  # Still need the class for similarity_fn
-from .ebr.retrieve import run_retrieve_evaluation  # Only need the evaluation part
+from mteb.rteb.core.data import RetrieveDataModule  # Need this to load data
+from mteb.rteb.core.retriever import Retriever  # Still need the class for similarity_fn
+from mteb.rteb.retrieve import run_retrieve_evaluation  # Only need the evaluation part
 
 # RTEB Imports (using relative paths within mteb.rteb)
-from .ebr.utils.data import JSONLDataset  # Still needed if we implement save/load
-from .ebr.utils.distributed import gather_list
+from mteb.rteb.utils.data import JSONLDataset  # Still needed if we implement save/load
+from mteb.rteb.utils.distributed import gather_list
 
 logger = logging.getLogger(__name__)
 

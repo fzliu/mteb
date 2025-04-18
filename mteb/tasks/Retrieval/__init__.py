@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+# Only import concrete RTEB task subclasses
+from mteb.tasks.Retrieval.rteb.RTEBLegalQuADTask import (
+    RTEBLegalQuAD as RTEBLegalQuAD,
+)  # Import from the new dedicated file
+
 from .ara.SadeemQuestionRetrieval import *
 from .code.AppsRetrieval import *
 from .code.CodeEditSearchRetrieval import *
@@ -179,11 +184,6 @@ from .pol.QuoraPLRetrieval import *
 from .pol.SCIDOCSPLRetrieval import *
 from .pol.SciFactPLRetrieval import *
 from .pol.TRECCOVIDPLRetrieval import *
-
-# Only import concrete RTEB task subclasses
-from .RTEBLegalQuADTask import (
-    RTEBLegalQuAD as RTEBLegalQuAD,
-)  # Import from the new dedicated file
 
 # Add other concrete RTEB task imports here if created, e.g.:
 # from .RTEBNFCorpusTask import RTEBNFCorpus
