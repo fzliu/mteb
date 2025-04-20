@@ -11,7 +11,7 @@ from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
 
 # RTEB Integration Imports
-from mteb.rteb.rteb_base_task import RTEBTaskRunner  # Import the helper class
+from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 
 logger = logging.getLogger(__name__)
 
