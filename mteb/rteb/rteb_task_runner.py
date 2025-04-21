@@ -185,9 +185,11 @@ class RTEBTaskRunner:
         )
         task_save_path = Path(args.save_path) / model_name
         task_save_path.mkdir(parents=True, exist_ok=True)
+        rteb_cache_path = Path(f"rteb_cache/{rteb_dataset_name}") / model_name
+        rteb_cache_path.mkdir(parents=True, exist_ok=True)
 
         # Check if results already exist
-        eval_file = task_save_path / RETRIEVE_EVAL_FILENAME  # Use consistent filename
+        eval_file = rteb_cache_path / RETRIEVE_EVAL_FILENAME  # Use consistent filename
         if not args.overwrite and eval_file.exists():
             if trainer.is_global_zero:
                 logger.info(
@@ -307,7 +309,7 @@ class RTEBTaskRunner:
             len(dm.dataset.queries) < args.embd_in_memory_threshold
         )
         retriever_instance.save_file = str(
-            task_save_path / RETRIEVE_PRED_FILENAME
+            rteb_cache_path / RETRIEVE_PRED_FILENAME
         )  # Use consistent filename
         retriever_instance.save_prediction = True  # Ensure prediction is saved
 
@@ -332,7 +334,7 @@ class RTEBTaskRunner:
                     raise ValueError("Relevance data is missing.")
 
                 # Load predictions from the file saved by the retriever
-                prediction_file = task_save_path / RETRIEVE_PRED_FILENAME
+                prediction_file = rteb_cache_path / RETRIEVE_PRED_FILENAME
                 if not prediction_file.exists():
                     logger.error(f"Prediction file not found at {prediction_file}")
                     raise FileNotFoundError(
