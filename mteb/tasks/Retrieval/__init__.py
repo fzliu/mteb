@@ -1,10 +1,28 @@
 from __future__ import annotations
 
-# Only import concrete RTEB task subclasses
-from mteb.tasks.Retrieval.rteb.RTEBLegalQuADTask import (
-    RTEBLegalQuAD as RTEBLegalQuAD,
-)  # Import from the new dedicated file
-
+# TODO
+# from .rteb.RTEBChatDoctor_HealthCareMagicTask import RTEBChatDoctor_HealthCareMagic as RTEBChatDoctor_HealthCareMagic
+# from .rteb.RTEBConvFinQATask import RTEBConvFinQA as RTEBConvFinQA
+# from .rteb.RTEBCOVID_QATask import RTEBCOVID_QA as RTEBCOVID_QA
+# from .rteb.RTEBDialogsumGermanTask import RTEBDialogsumGerman as RTEBDialogsumGerman
+# from .rteb.RTEBDS1000Task import RTEBDS1000 as RTEBDS1000
+# from .rteb.RTEBFinanceBenchTask import RTEBFinanceBench as RTEBFinanceBench
+# from .rteb.RTEBFinQATask import RTEBFinQA as RTEBFinQA
+# from .rteb.RTEBFiQAPersonalFinanceTask import RTEBFiQAPersonalFinance as RTEBFiQAPersonalFinance
+# from .rteb.RTEBFrenchBoolQTask import RTEBFrenchBoolQ as RTEBFrenchBoolQ
+# from .rteb.RTEBFrenchOpenFiscalTextsTask import RTEBFrenchOpenFiscalTexts as RTEBFrenchOpenFiscalTexts
+# from .rteb.RTEBFrenchTriviaQAWikicontextTask import RTEBFrenchTriviaQAWikicontext as RTEBFrenchTriviaQAWikicontext
+# from .rteb.RTEBGermanLegalSentencesTask import RTEBGermanLegalSentences as RTEBGermanLegalSentences
+# from .rteb.RTEBGithubTask import RTEBGithub as RTEBGithub
+# from .rteb.RTEBHC3FinanceTask import RTEBHC3Finance as RTEBHC3Finance
+# from .rteb.RTEBHealthCareGermanTask import RTEBHealthCareGerman as RTEBHealthCareGerman
+# from .rteb.RTEBHumanEvalTask import RTEBHumanEval as RTEBHumanEval
+# from .rteb.RTEBJapaneseCoNaLaTask import RTEBJapaneseCoNaLa as RTEBJapaneseCoNaLa
+# from .rteb.RTEBJapanLawTask import RTEBJapanLaw as RTEBJapanLaw
+# from .rteb.RTEBLegalSummarizationTask import RTEBLegalSummarization as RTEBLegalSummarization
+# from .rteb.RTEBMBPPTask import RTEBMBPP as RTEBMBPP
+# from .rteb.RTEBTAT_QATask import RTEBTAT_QA as RTEBTAT_QA
+# from .rteb.RTEBWikiSQLTask import RTEBWikiSQL as RTEBWikiSQL
 from .ara.SadeemQuestionRetrieval import *
 from .code.AppsRetrieval import *
 from .code.CodeEditSearchRetrieval import *
@@ -184,6 +202,10 @@ from .pol.QuoraPLRetrieval import *
 from .pol.SCIDOCSPLRetrieval import *
 from .pol.SciFactPLRetrieval import *
 from .pol.TRECCOVIDPLRetrieval import *
+from .rteb.RTEBAILACasedocsTask import RTEBAILACasedocs as RTEBAILACasedocs
+from .rteb.RTEBAILAStatutesTask import RTEBAILAStatutes as RTEBAILAStatutes
+from .rteb.RTEBAPPSTask import RTEBAPPS as RTEBAPPS
+from .rteb.RTEBLegalQuADTask import RTEBLegalQuAD as RTEBLegalQuAD
 from .rus.RiaNewsRetrieval import *
 from .rus.RuBQRetrieval import *
 from .slk.SKQuadRetrieval import *
