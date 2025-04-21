@@ -21,7 +21,7 @@ class Encoder(LightningModule):
         load_embds: bool = False,
         **kwargs,
     ):
-        super().__init__()
+        super().__init__(**kwargs)
         self._model = model
         self._load_embds = load_embds
         self._save_embds = save_embds
