@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for HumanEval
+# Concrete RTEB task definition for DS1000
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,24 +16,24 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- HumanEval Specific Task ---
-_HUMANEVAL_TASK_NAME = "RTEBHumanEval"
-_HUMANEVAL_DESCRIPTION = "RTEB evaluation for HumanEval dataset."
+# --- DS1000 Specific Task ---
+_DS1000_TASK_NAME = "RTEBDS1000"
+_DS1000_DESCRIPTION = "RTEB evaluation for DS1000 dataset."
 # Use the user-provided path
-_HUMANEVAL_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_HUMANEVAL_DATASET_NAME = "HumanEval"
-_HUMANEVAL_METADATA = TaskMetadata(
-    name=_HUMANEVAL_TASK_NAME,
-    description=_HUMANEVAL_DESCRIPTION,
+_DS1000_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_DS1000_DATASET_NAME = "DS1000"
+_DS1000_METADATA = TaskMetadata(
+    name=_DS1000_TASK_NAME,
+    description=_DS1000_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/HumanEval",  # TODO: Verify HF path or if local only
+        "path": "TODO/DS1000",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # Assuming English based on name
+    eval_langs=["eng-Latn"],  # From text.py groups
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
@@ -49,11 +49,11 @@ _HUMANEVAL_METADATA = TaskMetadata(
 )
 
 
-class RTEBHumanEval(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _HUMANEVAL_METADATA
+class RTEBDS1000(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _DS1000_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _HUMANEVAL_DATA_PATH
-    rteb_dataset_name = _HUMANEVAL_DATASET_NAME
+    rteb_data_path = _DS1000_DATA_PATH
+    rteb_dataset_name = _DS1000_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +107,4 @@ class RTEBHumanEval(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRe
         return scores
 
 
-# --- End HumanEval Specific Task ---
+# --- End DS1000 Specific Task ---

@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for MBPP
+# Concrete RTEB task definition for FiQAPersonalFinance
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,18 +16,20 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- MBPP Specific Task ---
-_MBPP_TASK_NAME = "RTEBMBPP"
-_MBPP_DESCRIPTION = "RTEB evaluation for MBPP dataset."
+# --- FiQAPersonalFinance Specific Task ---
+_FIQAPERSONALFINANCE_TASK_NAME = "RTEBFiQAPersonalFinance"
+_FIQAPERSONALFINANCE_DESCRIPTION = "RTEB evaluation for FiQAPersonalFinance dataset."
 # Use the user-provided path
-_MBPP_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_MBPP_DATASET_NAME = "MBPP"
-_MBPP_METADATA = TaskMetadata(
-    name=_MBPP_TASK_NAME,
-    description=_MBPP_DESCRIPTION,
+_FIQAPERSONALFINANCE_DATA_PATH = (
+    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+)
+_FIQAPERSONALFINANCE_DATASET_NAME = "FiQAPersonalFinance"
+_FIQAPERSONALFINANCE_METADATA = TaskMetadata(
+    name=_FIQAPERSONALFINANCE_TASK_NAME,
+    description=_FIQAPERSONALFINANCE_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/MBPP",  # TODO: Verify HF path or if local only
+        "path": "TODO/FiQAPersonalFinance",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
@@ -37,7 +39,7 @@ _MBPP_METADATA = TaskMetadata(
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Code"],  # From text.py groups
+    domains=["Finance"],  # Assuming Finance based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,11 +51,11 @@ _MBPP_METADATA = TaskMetadata(
 )
 
 
-class RTEBMBPP(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _MBPP_METADATA
+class RTEBFiQAPersonalFinance(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _FIQAPERSONALFINANCE_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _MBPP_DATA_PATH
-    rteb_dataset_name = _MBPP_DATASET_NAME
+    rteb_data_path = _FIQAPERSONALFINANCE_DATA_PATH
+    rteb_dataset_name = _FIQAPERSONALFINANCE_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +109,4 @@ class RTEBMBPP(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetriev
         return scores
 
 
-# --- End MBPP Specific Task ---
+# --- End FiQAPersonalFinance Specific Task ---

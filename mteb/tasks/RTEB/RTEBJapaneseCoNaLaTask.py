@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for GermanLegalSentences
+# Concrete RTEB task definition for JapaneseCoNaLa
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,30 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- GermanLegalSentences Specific Task ---
-_GERMANLEGALSENTENCES_TASK_NAME = "RTEBGermanLegalSentences"
-_GERMANLEGALSENTENCES_DESCRIPTION = "RTEB evaluation for GermanLegalSentences dataset."
+# --- JapaneseCoNaLa Specific Task ---
+_JAPANESECONALA_TASK_NAME = "RTEBJapaneseCoNaLa"
+_JAPANESECONALA_DESCRIPTION = "RTEB evaluation for JapaneseCoNaLa dataset."
 # Use the user-provided path
-_GERMANLEGALSENTENCES_DATA_PATH = (
-    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-)
-_GERMANLEGALSENTENCES_DATASET_NAME = "GermanLegalSentences"
-_GERMANLEGALSENTENCES_METADATA = TaskMetadata(
-    name=_GERMANLEGALSENTENCES_TASK_NAME,
-    description=_GERMANLEGALSENTENCES_DESCRIPTION,
+_JAPANESECONALA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_JAPANESECONALA_DATASET_NAME = "JapaneseCoNaLa"
+_JAPANESECONALA_METADATA = TaskMetadata(
+    name=_JAPANESECONALA_TASK_NAME,
+    description=_JAPANESECONALA_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/GermanLegalSentences",  # TODO: Verify HF path or if local only
+        "path": "TODO/JapaneseCoNaLa",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["deu-Latn"],  # Assuming German based on name
+    eval_langs=["jpn-Jpan"],  # Assuming Japanese based on name
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Legal"],  # Assuming Legal based on name
+    domains=["Code"],  # Assuming Code based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -51,13 +49,11 @@ _GERMANLEGALSENTENCES_METADATA = TaskMetadata(
 )
 
 
-class RTEBGermanLegalSentences(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _GERMANLEGALSENTENCES_METADATA
+class RTEBJapaneseCoNaLa(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _JAPANESECONALA_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _GERMANLEGALSENTENCES_DATA_PATH
-    rteb_dataset_name = _GERMANLEGALSENTENCES_DATASET_NAME
+    rteb_data_path = _JAPANESECONALA_DATA_PATH
+    rteb_dataset_name = _JAPANESECONALA_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,4 +107,4 @@ class RTEBGermanLegalSentences(
         return scores
 
 
-# --- End GermanLegalSentences Specific Task ---
+# --- End JapaneseCoNaLa Specific Task ---

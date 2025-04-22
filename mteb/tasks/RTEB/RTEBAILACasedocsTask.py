@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for HealthCareGerman
+# Concrete RTEB task definition for AILACasedocs
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,48 +16,58 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- HealthCareGerman Specific Task ---
-_HEALTHCAREGerman_TASK_NAME = "RTEBHealthCareGerman"
-_HEALTHCAREGerman_DESCRIPTION = "RTEB evaluation for HealthCareGerman dataset."
+# --- AILACasedocs Specific Task ---
+_AILACASEDOCS_TASK_NAME = "RTEBAILACasedocs"
+_AILACASEDOCS_DESCRIPTION = "RTEB evaluation for AILACasedocs dataset."
 # Use the user-provided path
-_HEALTHCAREGerman_DATA_PATH = (
-    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-)
-_HEALTHCAREGerman_DATASET_NAME = "HealthCareGerman"
-_HEALTHCAREGerman_METADATA = TaskMetadata(
-    name=_HEALTHCAREGerman_TASK_NAME,
-    description=_HEALTHCAREGerman_DESCRIPTION,
-    reference=None,  # TODO: Add reference URL
+_AILACASEDOCS_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_AILACASEDOCS_DATASET_NAME = "AILACasedocs"
+_AILACASEDOCS_METADATA = TaskMetadata(
+    name=_AILACASEDOCS_TASK_NAME,
+    description=_AILACASEDOCS_DESCRIPTION,
+    reference="https://zenodo.org/records/4063986",
     dataset={
-        "path": "TODO/HealthCareGerman",  # TODO: Verify HF path or if local only
-        "revision": "main",  # TODO: Verify revision
+        "path": "mteb/AILA_casedocs",
+        "revision": "4106e6bcc72e0698d714ea8b101355e3e238431a",
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["deu-Latn"],  # Assuming German based on name
+    eval_langs=["eng-Latn"],  # From text.py groups
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
-    date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Healthcare"],  # Assuming Healthcare based on name
-    task_subtypes=[],
-    license="unknown",  # TODO: Add license
-    annotations_creators="derived",  # Assuming similar to example
-    dialect=[],
-    text_creation="found",  # Assuming similar to example
-    bibtex_citation="""TODO: Add bibtex citation""",
+    date=None,
+    domains=["Legal", "Written"],  # From text.py groups
+    task_subtypes=["Article retrieval"],
+    license="cc-by-4.0",
+    annotations_creators="derived",
+    dialect=None,
+    text_creation="found",
+    bibtex_citation="""@dataset{paheli_bhattacharya_2020_4063986,
+  author       = {Paheli Bhattacharya and
+                  Kripabandhu Ghosh and
+                  Saptarshi Ghosh and
+                  Arindam Pal and
+                  Parth Mehta and
+                  Arnab Bhattacharya and
+                  Prasenjit Majumder},
+  title        = {AILA 2019 Precedent \& Statute Retrieval Task},
+  month        = oct,
+  year         = 2020,
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.4063986},
+  url          = {https://doi.org/10.5281/zenodo.4063986}
+}""",
     modalities=["text"],
     hf_subsets_to_langscripts={},
 )
 
 
-class RTEBHealthCareGerman(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _HEALTHCAREGerman_METADATA
+class RTEBAILACasedocs(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _AILACASEDOCS_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _HEALTHCAREGerman_DATA_PATH
-    rteb_dataset_name = _HEALTHCAREGerman_DATASET_NAME
+    rteb_data_path = _AILACASEDOCS_DATA_PATH
+    rteb_dataset_name = _AILACASEDOCS_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,4 +121,4 @@ class RTEBHealthCareGerman(
         return scores
 
 
-# --- End HealthCareGerman Specific Task ---
+# --- End AILACasedocs Specific Task ---

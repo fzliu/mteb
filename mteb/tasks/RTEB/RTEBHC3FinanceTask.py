@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for JapaneseCoNaLa
+# Concrete RTEB task definition for HC3Finance
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,28 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- JapaneseCoNaLa Specific Task ---
-_JAPANESECONALA_TASK_NAME = "RTEBJapaneseCoNaLa"
-_JAPANESECONALA_DESCRIPTION = "RTEB evaluation for JapaneseCoNaLa dataset."
+# --- HC3Finance Specific Task ---
+_HC3FINANCE_TASK_NAME = "RTEBHC3Finance"
+_HC3FINANCE_DESCRIPTION = "RTEB evaluation for HC3Finance dataset."
 # Use the user-provided path
-_JAPANESECONALA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_JAPANESECONALA_DATASET_NAME = "JapaneseCoNaLa"
-_JAPANESECONALA_METADATA = TaskMetadata(
-    name=_JAPANESECONALA_TASK_NAME,
-    description=_JAPANESECONALA_DESCRIPTION,
+_HC3FINANCE_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_HC3FINANCE_DATASET_NAME = "HC3Finance"
+_HC3FINANCE_METADATA = TaskMetadata(
+    name=_HC3FINANCE_TASK_NAME,
+    description=_HC3FINANCE_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/JapaneseCoNaLa",  # TODO: Verify HF path or if local only
+        "path": "TODO/HC3Finance",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["jpn-Jpan"],  # Assuming Japanese based on name
+    eval_langs=["eng-Latn"],  # From text.py groups
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Code"],  # Assuming Code based on name
+    domains=["Finance"],  # From text.py groups
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,13 +49,11 @@ _JAPANESECONALA_METADATA = TaskMetadata(
 )
 
 
-class RTEBJapaneseCoNaLa(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _JAPANESECONALA_METADATA
+class RTEBHC3Finance(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _HC3FINANCE_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _JAPANESECONALA_DATA_PATH
-    rteb_dataset_name = _JAPANESECONALA_DATASET_NAME
+    rteb_data_path = _HC3FINANCE_DATA_PATH
+    rteb_dataset_name = _HC3FINANCE_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -109,4 +107,4 @@ class RTEBJapaneseCoNaLa(
         return scores
 
 
-# --- End JapaneseCoNaLa Specific Task ---
+# --- End HC3Finance Specific Task ---

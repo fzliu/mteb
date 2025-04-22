@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for COVID_QA
+# Concrete RTEB task definition for Github
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,18 +16,18 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- COVID_QA Specific Task ---
-_COVID_QA_TASK_NAME = "RTEBCOVID_QA"
-_COVID_QA_DESCRIPTION = "RTEB evaluation for COVID_QA dataset."
+# --- Github Specific Task ---
+_GITHUB_TASK_NAME = "RTEBGithub"
+_GITHUB_DESCRIPTION = "RTEB evaluation for Github dataset."
 # Use the user-provided path
-_COVID_QA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_COVID_QA_DATASET_NAME = "COVID_QA"
-_COVID_QA_METADATA = TaskMetadata(
-    name=_COVID_QA_TASK_NAME,
-    description=_COVID_QA_DESCRIPTION,
+_GITHUB_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_GITHUB_DATASET_NAME = "Github"
+_GITHUB_METADATA = TaskMetadata(
+    name=_GITHUB_TASK_NAME,
+    description=_GITHUB_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/COVID_QA",  # TODO: Verify HF path or if local only
+        "path": "TODO/Github",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
@@ -37,7 +37,7 @@ _COVID_QA_METADATA = TaskMetadata(
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Healthcare"],  # Assuming Healthcare based on name
+    domains=["Code"],  # Assuming Code based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,11 +49,11 @@ _COVID_QA_METADATA = TaskMetadata(
 )
 
 
-class RTEBCOVID_QA(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _COVID_QA_METADATA
+class RTEBGithub(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _GITHUB_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _COVID_QA_DATA_PATH
-    rteb_dataset_name = _COVID_QA_DATASET_NAME
+    rteb_data_path = _GITHUB_DATA_PATH
+    rteb_dataset_name = _GITHUB_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +107,4 @@ class RTEBCOVID_QA(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRet
         return scores
 
 
-# --- End COVID_QA Specific Task ---
+# --- End Github Specific Task ---

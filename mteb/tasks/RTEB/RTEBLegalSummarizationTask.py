@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for FinanceBench
+# Concrete RTEB task definition for LegalSummarization
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,18 +16,20 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- FinanceBench Specific Task ---
-_FINANCEBENCH_TASK_NAME = "RTEBFinanceBench"
-_FINANCEBENCH_DESCRIPTION = "RTEB evaluation for FinanceBench dataset."
+# --- LegalSummarization Specific Task ---
+_LEGALSUMMARIZATION_TASK_NAME = "RTEBLegalSummarization"
+_LEGALSUMMARIZATION_DESCRIPTION = "RTEB evaluation for LegalSummarization dataset."
 # Use the user-provided path
-_FINANCEBENCH_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_FINANCEBENCH_DATASET_NAME = "FinanceBench"
-_FINANCEBENCH_METADATA = TaskMetadata(
-    name=_FINANCEBENCH_TASK_NAME,
-    description=_FINANCEBENCH_DESCRIPTION,
+_LEGALSUMMARIZATION_DATA_PATH = (
+    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+)
+_LEGALSUMMARIZATION_DATASET_NAME = "LegalSummarization"
+_LEGALSUMMARIZATION_METADATA = TaskMetadata(
+    name=_LEGALSUMMARIZATION_TASK_NAME,
+    description=_LEGALSUMMARIZATION_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/FinanceBench",  # TODO: Verify HF path or if local only
+        "path": "TODO/LegalSummarization",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
@@ -37,7 +39,7 @@ _FINANCEBENCH_METADATA = TaskMetadata(
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Finance"],  # From text.py groups
+    domains=["Legal"],  # From text.py groups
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,13 +51,11 @@ _FINANCEBENCH_METADATA = TaskMetadata(
 )
 
 
-class RTEBFinanceBench(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _FINANCEBENCH_METADATA
+class RTEBLegalSummarization(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _LEGALSUMMARIZATION_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _FINANCEBENCH_DATA_PATH
-    rteb_dataset_name = _FINANCEBENCH_DATASET_NAME
+    rteb_data_path = _LEGALSUMMARIZATION_DATA_PATH
+    rteb_dataset_name = _LEGALSUMMARIZATION_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -109,4 +109,4 @@ class RTEBFinanceBench(
         return scores
 
 
-# --- End FinanceBench Specific Task ---
+# --- End LegalSummarization Specific Task ---

@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for Github
+# Concrete RTEB task definition for APPS
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,44 +16,49 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- Github Specific Task ---
-_GITHUB_TASK_NAME = "RTEBGithub"
-_GITHUB_DESCRIPTION = "RTEB evaluation for Github dataset."
+# --- APPS Specific Task ---
+_APPS_TASK_NAME = "RTEBAPPS"
+_APPS_DESCRIPTION = "RTEB evaluation for APPS dataset."
 # Use the user-provided path
-_GITHUB_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_GITHUB_DATASET_NAME = "Github"
-_GITHUB_METADATA = TaskMetadata(
-    name=_GITHUB_TASK_NAME,
-    description=_GITHUB_DESCRIPTION,
-    reference=None,  # TODO: Add reference URL
+_APPS_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_APPS_DATASET_NAME = "APPS"
+_APPS_METADATA = TaskMetadata(
+    name=_APPS_TASK_NAME,
+    description=_APPS_DESCRIPTION,
+    reference="https://arxiv.org/abs/2105.09938",
     dataset={
-        "path": "TODO/Github",  # TODO: Verify HF path or if local only
-        "revision": "main",  # TODO: Verify revision
+        "path": "CoIR-Retrieval/apps",
+        "revision": "f22508f96b7a36c2415181ed8bb76f76e04ae2d5",
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # Assuming English based on name
+    eval_langs=["eng-Latn", "python-Code"],
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
-    date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Code"],  # Assuming Code based on name
-    task_subtypes=[],
-    license="unknown",  # TODO: Add license
-    annotations_creators="derived",  # Assuming similar to example
+    date=("2021-05-20", "2021-05-20"),
+    domains=["Programming", "Written"],
+    task_subtypes=["Code retrieval"],
+    license="mit",
+    annotations_creators="derived",
     dialect=[],
-    text_creation="found",  # Assuming similar to example
-    bibtex_citation="""TODO: Add bibtex citation""",
+    text_creation="found",
+    bibtex_citation="""@article{hendrycksapps2021,
+  title={Measuring Coding Challenge Competence With APPS},
+  author={Dan Hendrycks and Steven Basart and Saurav Kadavath and Mantas Mazeika and Akul Arora and Ethan Guo and Collin Burns and Samir Puranik and Horace He and Dawn Song and Jacob Steinhardt},
+  journal={NeurIPS},
+  year={2021}
+}""",
     modalities=["text"],
     hf_subsets_to_langscripts={},
 )
 
 
-class RTEBGithub(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _GITHUB_METADATA
+class RTEBAPPS(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _APPS_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _GITHUB_DATA_PATH
-    rteb_dataset_name = _GITHUB_DATASET_NAME
+    rteb_data_path = _APPS_DATA_PATH
+    rteb_dataset_name = _APPS_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +112,4 @@ class RTEBGithub(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetri
         return scores
 
 
-# --- End Github Specific Task ---
+# --- End APPS Specific Task ---

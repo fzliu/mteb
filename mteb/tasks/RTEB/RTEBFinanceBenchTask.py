@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for FrenchBoolQ
+# Concrete RTEB task definition for FinanceBench
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,28 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- FrenchBoolQ Specific Task ---
-_FRENCHBOOLQ_TASK_NAME = "RTEBFrenchBoolQ"
-_FRENCHBOOLQ_DESCRIPTION = "RTEB evaluation for FrenchBoolQ dataset."
+# --- FinanceBench Specific Task ---
+_FINANCEBENCH_TASK_NAME = "RTEBFinanceBench"
+_FINANCEBENCH_DESCRIPTION = "RTEB evaluation for FinanceBench dataset."
 # Use the user-provided path
-_FRENCHBOOLQ_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_FRENCHBOOLQ_DATASET_NAME = "FrenchBoolQ"
-_FRENCHBOOLQ_METADATA = TaskMetadata(
-    name=_FRENCHBOOLQ_TASK_NAME,
-    description=_FRENCHBOOLQ_DESCRIPTION,
+_FINANCEBENCH_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_FINANCEBENCH_DATASET_NAME = "FinanceBench"
+_FINANCEBENCH_METADATA = TaskMetadata(
+    name=_FINANCEBENCH_TASK_NAME,
+    description=_FINANCEBENCH_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/FrenchBoolQ",  # TODO: Verify HF path or if local only
+        "path": "TODO/FinanceBench",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["fra-Latn"],  # From text.py groups
+    eval_langs=["eng-Latn"],  # From text.py groups
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Question Answering"],  # Assuming QA based on name
+    domains=["Finance"],  # From text.py groups
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,13 +49,11 @@ _FRENCHBOOLQ_METADATA = TaskMetadata(
 )
 
 
-class RTEBFrenchBoolQ(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _FRENCHBOOLQ_METADATA
+class RTEBFinanceBench(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _FINANCEBENCH_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _FRENCHBOOLQ_DATA_PATH
-    rteb_dataset_name = _FRENCHBOOLQ_DATASET_NAME
+    rteb_data_path = _FINANCEBENCH_DATA_PATH
+    rteb_dataset_name = _FINANCEBENCH_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -109,4 +107,4 @@ class RTEBFrenchBoolQ(
         return scores
 
 
-# --- End FrenchBoolQ Specific Task ---
+# --- End FinanceBench Specific Task ---

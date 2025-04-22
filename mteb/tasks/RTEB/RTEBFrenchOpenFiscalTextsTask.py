@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for ConvFinQA
+# Concrete RTEB task definition for FrenchOpenFiscalTexts
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,28 +16,32 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- ConvFinQA Specific Task ---
-_CONVFINQA_TASK_NAME = "RTEBConvFinQA"
-_CONVFINQA_DESCRIPTION = "RTEB evaluation for ConvFinQA dataset."
+# --- FrenchOpenFiscalTexts Specific Task ---
+_FRENCHOPENFISCALTEXTS_TASK_NAME = "RTEBFrenchOpenFiscalTexts"
+_FRENCHOPENFISCALTEXTS_DESCRIPTION = (
+    "RTEB evaluation for FrenchOpenFiscalTexts dataset."
+)
 # Use the user-provided path
-_CONVFINQA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_CONVFINQA_DATASET_NAME = "ConvFinQA"
-_CONVFINQA_METADATA = TaskMetadata(
-    name=_CONVFINQA_TASK_NAME,
-    description=_CONVFINQA_DESCRIPTION,
+_FRENCHOPENFISCALTEXTS_DATA_PATH = (
+    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+)
+_FRENCHOPENFISCALTEXTS_DATASET_NAME = "FrenchOpenFiscalTexts"
+_FRENCHOPENFISCALTEXTS_METADATA = TaskMetadata(
+    name=_FRENCHOPENFISCALTEXTS_TASK_NAME,
+    description=_FRENCHOPENFISCALTEXTS_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/ConvFinQA",  # TODO: Verify HF path or if local only
+        "path": "TODO/FrenchOpenFiscalTexts",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # Assuming English based on name
+    eval_langs=["fra-Latn"],  # Assuming French based on name
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Finance"],  # Assuming Finance based on name
+    domains=["Legal", "Finance"],  # Assuming Legal and Finance based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,11 +53,13 @@ _CONVFINQA_METADATA = TaskMetadata(
 )
 
 
-class RTEBConvFinQA(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _CONVFINQA_METADATA
+class RTEBFrenchOpenFiscalTexts(
+    AbsTaskRTEB
+):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _FRENCHOPENFISCALTEXTS_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _CONVFINQA_DATA_PATH
-    rteb_dataset_name = _CONVFINQA_DATASET_NAME
+    rteb_data_path = _FRENCHOPENFISCALTEXTS_DATA_PATH
+    rteb_dataset_name = _FRENCHOPENFISCALTEXTS_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +113,4 @@ class RTEBConvFinQA(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRe
         return scores
 
 
-# --- End ConvFinQA Specific Task ---
+# --- End FrenchOpenFiscalTexts Specific Task ---

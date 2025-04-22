@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for FiQAPersonalFinance
+# Concrete RTEB task definition for DialogsumGerman
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,30 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- FiQAPersonalFinance Specific Task ---
-_FIQAPERSONALFINANCE_TASK_NAME = "RTEBFiQAPersonalFinance"
-_FIQAPERSONALFINANCE_DESCRIPTION = "RTEB evaluation for FiQAPersonalFinance dataset."
+# --- DialogsumGerman Specific Task ---
+_DIALOGSUMGERMAN_TASK_NAME = "RTEBDialogsumGerman"
+_DIALOGSUMGERMAN_DESCRIPTION = "RTEB evaluation for DialogsumGerman dataset."
 # Use the user-provided path
-_FIQAPERSONALFINANCE_DATA_PATH = (
-    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-)
-_FIQAPERSONALFINANCE_DATASET_NAME = "FiQAPersonalFinance"
-_FIQAPERSONALFINANCE_METADATA = TaskMetadata(
-    name=_FIQAPERSONALFINANCE_TASK_NAME,
-    description=_FIQAPERSONALFINANCE_DESCRIPTION,
+_DIALOGSUMGERMAN_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_DIALOGSUMGERMAN_DATASET_NAME = "DialogsumGerman"
+_DIALOGSUMGERMAN_METADATA = TaskMetadata(
+    name=_DIALOGSUMGERMAN_TASK_NAME,
+    description=_DIALOGSUMGERMAN_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/FiQAPersonalFinance",  # TODO: Verify HF path or if local only
+        "path": "TODO/DialogsumGerman",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # Assuming English based on name
+    eval_langs=["deu-Latn"],  # Assuming German based on name
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Finance"],  # Assuming Finance based on name
+    domains=["Conversational"],  # Assuming conversational based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -51,13 +49,11 @@ _FIQAPERSONALFINANCE_METADATA = TaskMetadata(
 )
 
 
-class RTEBFiQAPersonalFinance(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _FIQAPERSONALFINANCE_METADATA
+class RTEBDialogsumGerman(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _DIALOGSUMGERMAN_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _FIQAPERSONALFINANCE_DATA_PATH
-    rteb_dataset_name = _FIQAPERSONALFINANCE_DATASET_NAME
+    rteb_data_path = _DIALOGSUMGERMAN_DATA_PATH
+    rteb_dataset_name = _DIALOGSUMGERMAN_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,4 +107,4 @@ class RTEBFiQAPersonalFinance(
         return scores
 
 
-# --- End FiQAPersonalFinance Specific Task ---
+# --- End DialogsumGerman Specific Task ---

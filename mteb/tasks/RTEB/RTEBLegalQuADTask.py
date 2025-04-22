@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for JapanLaw
+# Concrete RTEB task definition for LegalQuAD
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,44 +16,44 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- JapanLaw Specific Task ---
-_JAPANLAW_TASK_NAME = "RTEBJapanLaw"
-_JAPANLAW_DESCRIPTION = "RTEB evaluation for JapanLaw dataset."
+# --- LegalQuAD Specific Task ---
+_LEGALQUAD_TASK_NAME = "RTEBLegalQuAD"
+_LEGALQUAD_DESCRIPTION = "RTEB evaluation for LegalQuAD dataset."
 # Use the user-provided path
-_JAPANLAW_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_JAPANLAW_DATASET_NAME = "JapanLaw"
-_JAPANLAW_METADATA = TaskMetadata(
-    name=_JAPANLAW_TASK_NAME,
-    description=_JAPANLAW_DESCRIPTION,
-    reference=None,  # TODO: Add reference URL
+_LEGALQUAD_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_LEGALQUAD_DATASET_NAME = "LegalQuAD"
+_LEGALQUAD_METADATA = TaskMetadata(
+    name=_LEGALQUAD_TASK_NAME,
+    description=_LEGALQUAD_DESCRIPTION,
+    reference="https://github.com/elenanereiss/LegalQuAD",
     dataset={
-        "path": "TODO/JapanLaw",  # TODO: Verify HF path or if local only
-        "revision": "main",  # TODO: Verify revision
+        "path": "mteb/LegalQuAD",
+        "revision": "dd73c838031a4914a7a1a16d785b8cec617aaaa4",
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["jpn-Jpan"],  # Assuming Japanese based on name
+    eval_langs=["deu-Latn"],
     main_score="ndcg_at_10",
-    revision="1.0.0",  # Initial revision
-    date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Legal"],  # Assuming Legal based on name
+    revision="1.0.5",  # Increment revision for this refactoring
+    date=("2021-11-01", "2021-11-01"),
+    domains=["Legal"],
     task_subtypes=[],
-    license="unknown",  # TODO: Add license
-    annotations_creators="derived",  # Assuming similar to example
+    license="cc-by-nc-sa-4.0",
+    annotations_creators="derived",
     dialect=[],
-    text_creation="found",  # Assuming similar to example
-    bibtex_citation="""TODO: Add bibtex citation""",
+    text_creation="found",
+    bibtex_citation="""@inproceedings{reiss-etal-2021-legalquad, ... }""",  # Truncated
     modalities=["text"],
     hf_subsets_to_langscripts={},
 )
 
 
-class RTEBJapanLaw(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _JAPANLAW_METADATA
+class RTEBLegalQuAD(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _LEGALQUAD_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _JAPANLAW_DATA_PATH
-    rteb_dataset_name = _JAPANLAW_DATASET_NAME
+    rteb_data_path = _LEGALQUAD_DATA_PATH
+    rteb_dataset_name = _LEGALQUAD_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -106,5 +106,7 @@ class RTEBJapanLaw(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRet
         }
         return scores
 
+    # No need to implement _evaluate_subset here anymore, as evaluate calls the runner directly.
 
-# --- End JapanLaw Specific Task ---
+
+# --- End LegalQuAD Specific Task ---

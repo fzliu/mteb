@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for LegalSummarization
+# Concrete RTEB task definition for TAT_QA
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,30 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- LegalSummarization Specific Task ---
-_LEGALSUMMARIZATION_TASK_NAME = "RTEBLegalSummarization"
-_LEGALSUMMARIZATION_DESCRIPTION = "RTEB evaluation for LegalSummarization dataset."
+# --- TAT_QA Specific Task ---
+_TAT_QA_TASK_NAME = "RTEBTAT_QA"
+_TAT_QA_DESCRIPTION = "RTEB evaluation for TAT_QA dataset."
 # Use the user-provided path
-_LEGALSUMMARIZATION_DATA_PATH = (
-    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-)
-_LEGALSUMMARIZATION_DATASET_NAME = "LegalSummarization"
-_LEGALSUMMARIZATION_METADATA = TaskMetadata(
-    name=_LEGALSUMMARIZATION_TASK_NAME,
-    description=_LEGALSUMMARIZATION_DESCRIPTION,
+_TAT_QA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_TAT_QA_DATASET_NAME = "TAT_QA"
+_TAT_QA_METADATA = TaskMetadata(
+    name=_TAT_QA_TASK_NAME,
+    description=_TAT_QA_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/LegalSummarization",  # TODO: Verify HF path or if local only
+        "path": "TODO/TAT_QA",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # From text.py groups
+    eval_langs=["eng-Latn"],  # Assuming English based on name
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Legal"],  # From text.py groups
+    domains=["Finance", "Question Answering"],  # Assuming Finance and QA based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -51,13 +49,11 @@ _LEGALSUMMARIZATION_METADATA = TaskMetadata(
 )
 
 
-class RTEBLegalSummarization(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _LEGALSUMMARIZATION_METADATA
+class RTEBTAT_QA(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _TAT_QA_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _LEGALSUMMARIZATION_DATA_PATH
-    rteb_dataset_name = _LEGALSUMMARIZATION_DATASET_NAME
+    rteb_data_path = _TAT_QA_DATA_PATH
+    rteb_dataset_name = _TAT_QA_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -111,4 +107,4 @@ class RTEBLegalSummarization(
         return scores
 
 
-# --- End LegalSummarization Specific Task ---
+# --- End TAT_QA Specific Task ---

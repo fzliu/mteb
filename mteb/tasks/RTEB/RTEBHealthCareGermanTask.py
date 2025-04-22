@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for AILAStatutes
+# Concrete RTEB task definition for HealthCareGerman
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,60 +16,46 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- AILAStatutes Specific Task ---
-_AILASTATUTES_TASK_NAME = "RTEBAILAStatutes"
-_AILASTATUTES_DESCRIPTION = "RTEB evaluation for AILAStatutes dataset."
+# --- HealthCareGerman Specific Task ---
+_HEALTHCAREGerman_TASK_NAME = "RTEBHealthCareGerman"
+_HEALTHCAREGerman_DESCRIPTION = "RTEB evaluation for HealthCareGerman dataset."
 # Use the user-provided path
-_AILASTATUTES_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_AILASTATUTES_DATASET_NAME = "AILAStatutes"
-_AILASTATUTES_METADATA = TaskMetadata(
-    name=_AILASTATUTES_TASK_NAME,
-    description=_AILASTATUTES_DESCRIPTION,
-    reference="https://zenodo.org/records/4063986",
+_HEALTHCAREGerman_DATA_PATH = (
+    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+)
+_HEALTHCAREGerman_DATASET_NAME = "HealthCareGerman"
+_HEALTHCAREGerman_METADATA = TaskMetadata(
+    name=_HEALTHCAREGerman_TASK_NAME,
+    description=_HEALTHCAREGerman_DESCRIPTION,
+    reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "mteb/AILA_statutes",
-        "revision": "ebfcd844eadd3d667efa3c57fc5c8c87f5c2867e",
+        "path": "TODO/HealthCareGerman",  # TODO: Verify HF path or if local only
+        "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # From text.py groups
+    eval_langs=["deu-Latn"],  # Assuming German based on name
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
-    date=None,
-    domains=["Legal", "Written"],  # From text.py groups
-    task_subtypes=["Article retrieval"],
-    license="cc-by-4.0",
-    annotations_creators="derived",
-    dialect=None,
-    text_creation="found",
-    bibtex_citation="""@dataset{paheli_bhattacharya_2020_4063986,
-  author       = {Paheli Bhattacharya and
-                  Kripabandhu Ghosh and
-                  Saptarshi Ghosh and
-                  Arindam Pal and
-                  Parth Mehta and
-                  Arnab Bhattacharya and
-                  Prasenjit Majumder},
-  title        = {AILA 2019 Precedent \& Statute Retrieval Task},
-  month        = oct,
-  year         = 2020,
-  publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.4063986},
-  url          = {https://doi.org/10.5281/zenodo.4063986}
-}""",
+    date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
+    domains=["Healthcare"],  # Assuming Healthcare based on name
+    task_subtypes=[],
+    license="unknown",  # TODO: Add license
+    annotations_creators="derived",  # Assuming similar to example
+    dialect=[],
+    text_creation="found",  # Assuming similar to example
+    bibtex_citation="""TODO: Add bibtex citation""",
     modalities=["text"],
     hf_subsets_to_langscripts={},
 )
 
 
-class RTEBAILAStatutes(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _AILASTATUTES_METADATA
+class RTEBHealthCareGerman(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _HEALTHCAREGerman_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _AILASTATUTES_DATA_PATH
-    rteb_dataset_name = _AILASTATUTES_DATASET_NAME
+    rteb_data_path = _HEALTHCAREGerman_DATA_PATH
+    rteb_dataset_name = _HEALTHCAREGerman_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -123,4 +109,4 @@ class RTEBAILAStatutes(
         return scores
 
 
-# --- End AILAStatutes Specific Task ---
+# --- End HealthCareGerman Specific Task ---

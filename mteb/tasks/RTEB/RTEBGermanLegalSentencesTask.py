@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for DialogsumGerman
+# Concrete RTEB task definition for GermanLegalSentences
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,18 +16,20 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- DialogsumGerman Specific Task ---
-_DIALOGSUMGERMAN_TASK_NAME = "RTEBDialogsumGerman"
-_DIALOGSUMGERMAN_DESCRIPTION = "RTEB evaluation for DialogsumGerman dataset."
+# --- GermanLegalSentences Specific Task ---
+_GERMANLEGALSENTENCES_TASK_NAME = "RTEBGermanLegalSentences"
+_GERMANLEGALSENTENCES_DESCRIPTION = "RTEB evaluation for GermanLegalSentences dataset."
 # Use the user-provided path
-_DIALOGSUMGERMAN_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_DIALOGSUMGERMAN_DATASET_NAME = "DialogsumGerman"
-_DIALOGSUMGERMAN_METADATA = TaskMetadata(
-    name=_DIALOGSUMGERMAN_TASK_NAME,
-    description=_DIALOGSUMGERMAN_DESCRIPTION,
+_GERMANLEGALSENTENCES_DATA_PATH = (
+    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+)
+_GERMANLEGALSENTENCES_DATASET_NAME = "GermanLegalSentences"
+_GERMANLEGALSENTENCES_METADATA = TaskMetadata(
+    name=_GERMANLEGALSENTENCES_TASK_NAME,
+    description=_GERMANLEGALSENTENCES_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/DialogsumGerman",  # TODO: Verify HF path or if local only
+        "path": "TODO/GermanLegalSentences",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
@@ -37,7 +39,7 @@ _DIALOGSUMGERMAN_METADATA = TaskMetadata(
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Conversational"],  # Assuming conversational based on name
+    domains=["Legal"],  # Assuming Legal based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,13 +51,11 @@ _DIALOGSUMGERMAN_METADATA = TaskMetadata(
 )
 
 
-class RTEBDialogsumGerman(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _DIALOGSUMGERMAN_METADATA
+class RTEBGermanLegalSentences(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _GERMANLEGALSENTENCES_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _DIALOGSUMGERMAN_DATA_PATH
-    rteb_dataset_name = _DIALOGSUMGERMAN_DATASET_NAME
+    rteb_data_path = _GERMANLEGALSENTENCES_DATA_PATH
+    rteb_dataset_name = _GERMANLEGALSENTENCES_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -109,4 +109,4 @@ class RTEBDialogsumGerman(
         return scores
 
 
-# --- End DialogsumGerman Specific Task ---
+# --- End GermanLegalSentences Specific Task ---

@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for ChatDoctor_HealthCareMagic
+# Concrete RTEB task definition for FrenchBoolQ
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,32 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- ChatDoctor_HealthCareMagic Specific Task ---
-_CHATDOCTOR_HEALTHCAREMAGIC_TASK_NAME = "RTEBChatDoctor_HealthCareMagic"
-_CHATDOCTOR_HEALTHCAREMAGIC_DESCRIPTION = (
-    "RTEB evaluation for ChatDoctor_HealthCareMagic dataset."
-)
+# --- FrenchBoolQ Specific Task ---
+_FRENCHBOOLQ_TASK_NAME = "RTEBFrenchBoolQ"
+_FRENCHBOOLQ_DESCRIPTION = "RTEB evaluation for FrenchBoolQ dataset."
 # Use the user-provided path
-_CHATDOCTOR_HEALTHCAREMAGIC_DATA_PATH = (
-    "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-)
-_CHATDOCTOR_HEALTHCAREMAGIC_DATASET_NAME = "ChatDoctor_HealthCareMagic"
-_CHATDOCTOR_HEALTHCAREMAGIC_METADATA = TaskMetadata(
-    name=_CHATDOCTOR_HEALTHCAREMAGIC_TASK_NAME,
-    description=_CHATDOCTOR_HEALTHCAREMAGIC_DESCRIPTION,
+_FRENCHBOOLQ_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_FRENCHBOOLQ_DATASET_NAME = "FrenchBoolQ"
+_FRENCHBOOLQ_METADATA = TaskMetadata(
+    name=_FRENCHBOOLQ_TASK_NAME,
+    description=_FRENCHBOOLQ_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/ChatDoctor_HealthCareMagic",  # TODO: Verify HF path or if local only
+        "path": "TODO/FrenchBoolQ",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # From text.py groups
+    eval_langs=["fra-Latn"],  # From text.py groups
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Medical"],  # From text.py groups
+    domains=["Question Answering"],  # Assuming QA based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -53,13 +49,11 @@ _CHATDOCTOR_HEALTHCAREMAGIC_METADATA = TaskMetadata(
 )
 
 
-class RTEBChatDoctor_HealthCareMagic(
-    AbsTaskRetrieval
-):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _CHATDOCTOR_HEALTHCAREMAGIC_METADATA
+class RTEBFrenchBoolQ(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _FRENCHBOOLQ_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _CHATDOCTOR_HEALTHCAREMAGIC_DATA_PATH
-    rteb_dataset_name = _CHATDOCTOR_HEALTHCAREMAGIC_DATASET_NAME
+    rteb_data_path = _FRENCHBOOLQ_DATA_PATH
+    rteb_dataset_name = _FRENCHBOOLQ_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -113,4 +107,4 @@ class RTEBChatDoctor_HealthCareMagic(
         return scores
 
 
-# --- End ChatDoctor_HealthCareMagic Specific Task ---
+# --- End FrenchBoolQ Specific Task ---

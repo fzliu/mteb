@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for TAT_QA
+# Concrete RTEB task definition for JapanLaw
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,28 +16,28 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- TAT_QA Specific Task ---
-_TAT_QA_TASK_NAME = "RTEBTAT_QA"
-_TAT_QA_DESCRIPTION = "RTEB evaluation for TAT_QA dataset."
+# --- JapanLaw Specific Task ---
+_JAPANLAW_TASK_NAME = "RTEBJapanLaw"
+_JAPANLAW_DESCRIPTION = "RTEB evaluation for JapanLaw dataset."
 # Use the user-provided path
-_TAT_QA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_TAT_QA_DATASET_NAME = "TAT_QA"
-_TAT_QA_METADATA = TaskMetadata(
-    name=_TAT_QA_TASK_NAME,
-    description=_TAT_QA_DESCRIPTION,
+_JAPANLAW_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_JAPANLAW_DATASET_NAME = "JapanLaw"
+_JAPANLAW_METADATA = TaskMetadata(
+    name=_JAPANLAW_TASK_NAME,
+    description=_JAPANLAW_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/TAT_QA",  # TODO: Verify HF path or if local only
+        "path": "TODO/JapanLaw",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
     category="s2p",
     eval_splits=["test"],
-    eval_langs=["eng-Latn"],  # Assuming English based on name
+    eval_langs=["jpn-Jpan"],  # Assuming Japanese based on name
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Finance", "Question Answering"],  # Assuming Finance and QA based on name
+    domains=["Legal"],  # Assuming Legal based on name
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,11 +49,11 @@ _TAT_QA_METADATA = TaskMetadata(
 )
 
 
-class RTEBTAT_QA(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _TAT_QA_METADATA
+class RTEBJapanLaw(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _JAPANLAW_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _TAT_QA_DATA_PATH
-    rteb_dataset_name = _TAT_QA_DATASET_NAME
+    rteb_data_path = _JAPANLAW_DATA_PATH
+    rteb_dataset_name = _JAPANLAW_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +107,4 @@ class RTEBTAT_QA(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetri
         return scores
 
 
-# --- End TAT_QA Specific Task ---
+# --- End JapanLaw Specific Task ---

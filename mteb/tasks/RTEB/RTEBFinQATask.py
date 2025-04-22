@@ -1,11 +1,11 @@
-# Concrete RTEB task definition for DS1000
+# Concrete RTEB task definition for FinQA
 from __future__ import annotations
 
 import logging
 from typing import Any
 
 # MTEB Imports
-from mteb.abstasks.AbsTaskRetrieval import AbsTaskRetrieval
+from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.load_results.task_results import ScoresDict
@@ -16,18 +16,18 @@ from mteb.rteb.rteb_task_runner import RTEBTaskRunner  # Import the helper class
 logger = logging.getLogger(__name__)
 
 
-# --- DS1000 Specific Task ---
-_DS1000_TASK_NAME = "RTEBDS1000"
-_DS1000_DESCRIPTION = "RTEB evaluation for DS1000 dataset."
+# --- FinQA Specific Task ---
+_FINQA_TASK_NAME = "RTEBFinQA"
+_FINQA_DESCRIPTION = "RTEB evaluation for FinQA dataset."
 # Use the user-provided path
-_DS1000_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
-_DS1000_DATASET_NAME = "DS1000"
-_DS1000_METADATA = TaskMetadata(
-    name=_DS1000_TASK_NAME,
-    description=_DS1000_DESCRIPTION,
+_FINQA_DATA_PATH = "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data"
+_FINQA_DATASET_NAME = "FinQA"
+_FINQA_METADATA = TaskMetadata(
+    name=_FINQA_TASK_NAME,
+    description=_FINQA_DESCRIPTION,
     reference=None,  # TODO: Add reference URL
     dataset={
-        "path": "TODO/DS1000",  # TODO: Verify HF path or if local only
+        "path": "TODO/FinQA",  # TODO: Verify HF path or if local only
         "revision": "main",  # TODO: Verify revision
     },
     type="Retrieval",
@@ -37,7 +37,7 @@ _DS1000_METADATA = TaskMetadata(
     main_score="ndcg_at_10",
     revision="1.0.0",  # Initial revision
     date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-    domains=["Code"],  # From text.py groups
+    domains=["Finance"],  # From text.py groups
     task_subtypes=[],
     license="unknown",  # TODO: Add license
     annotations_creators="derived",  # Assuming similar to example
@@ -49,11 +49,11 @@ _DS1000_METADATA = TaskMetadata(
 )
 
 
-class RTEBDS1000(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetrieval
-    metadata = _DS1000_METADATA
+class RTEBFinQA(AbsTaskRTEB):  # Inherit directly from MTEB's AbsTaskRTEB
+    metadata = _FINQA_METADATA
     # Define RTEB specific paths as class attributes
-    rteb_data_path = _DS1000_DATA_PATH
-    rteb_dataset_name = _DS1000_DATASET_NAME
+    rteb_data_path = _FINQA_DATA_PATH
+    rteb_dataset_name = _FINQA_DATASET_NAME
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -107,4 +107,4 @@ class RTEBDS1000(AbsTaskRetrieval):  # Inherit directly from MTEB's AbsTaskRetri
         return scores
 
 
-# --- End DS1000 Specific Task ---
+# --- End FinQA Specific Task ---
