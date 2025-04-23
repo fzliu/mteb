@@ -4,7 +4,6 @@ from .RTEBAILACasedocsTask import RTEBAILACasedocs as RTEBAILACasedocs
 from .RTEBAILAStatutesTask import RTEBAILAStatutes as RTEBAILAStatutes
 from .RTEBAPPSTask import RTEBAPPS as RTEBAPPS
 from .RTEBLegalQuADTask import RTEBLegalQuAD as RTEBLegalQuAD
-# TODO
 # from .RTEBChatDoctor_HealthCareMagicTask import RTEBChatDoctor_HealthCareMagic as RTEBChatDoctor_HealthCareMagic
 # from .RTEBConvFinQATask import RTEBConvFinQA as RTEBConvFinQA
 # from .RTEBCOVID_QATask import RTEBCOVID_QA as RTEBCOVID_QA

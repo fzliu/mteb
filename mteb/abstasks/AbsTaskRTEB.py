@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import json
 import logging
 import os
@@ -12,9 +13,9 @@ from typing import Any
 from datasets import Features, Value, load_dataset
 
 from mteb.abstasks.TaskMetadata import HFSubset
+from mteb.load_results.task_results import ScoresDict
+from mteb.rteb.rteb_task_runner import RTEBTaskRunner
 
-from ..evaluation.evaluators import RetrievalEvaluator
-from ..load_results.task_results import ScoresDict
 from .AbsTask import AbsTask
 from .TaskMetadata import DescriptiveStatistics
 
@@ -249,7 +250,7 @@ class RetrievalDescriptiveStatistics(DescriptiveStatistics):
     unique_relevant_docs: int
 
 
-class AbsTaskRTEB(AbsTask):
+class AbsTaskRTEB(AbsTask, abc.ABC):
     """Abstract class for retrieval experiments.
 
     Child-classes must implement the following properties:
@@ -272,37 +273,56 @@ class AbsTaskRTEB(AbsTask):
     abstask_prompt = "Retrieve text based on user query."
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def load_data(self, **kwargs):
-        if self.data_loaded:
-            return
-        self.corpus, self.queries, self.relevant_docs = {}, {}, {}
-        dataset_path = self.metadata_dict["dataset"]["path"]
-        hf_repo_qrels = (
-            dataset_path + "-qrels" if "clarin-knext" in dataset_path else None
+        # Allow configuration via environment variable
+        self.rteb_data_path = kwargs.pop(
+            "rteb_data_path", os.environ.get("RTEB_DATA_PATH")
         )
-        for split in kwargs.get("eval_splits", self.metadata_dict["eval_splits"]):
-            corpus, queries, qrels = HFDataLoader(
-                hf_repo=dataset_path,
-                hf_repo_qrels=hf_repo_qrels,
-                streaming=False,
-                keep_in_memory=False,
-                trust_remote_code=self.metadata_dict["dataset"].get(
-                    "trust_remote_code", False
-                ),
-            ).load(split=split)
-            # Conversion from DataSet
-            queries = {query["id"]: query["text"] for query in queries}
-            corpus = {
-                doc["id"]: doc.get("title", "") + " " + doc["text"] for doc in corpus
-            }
-            self.corpus[split], self.queries[split], self.relevant_docs[split] = (
-                corpus,
-                queries,
-                qrels,
+        if self.rteb_data_path is None:
+            logger.warning(
+                f"No RTEB data path provided for {self.__class__.__name__}. "
+                "Set rteb_data_path in constructor or RTEB_DATA_PATH environment variable."
             )
 
+        # Derive dataset name from task name if not provided
+        self.rteb_dataset_name = kwargs.pop("rteb_dataset_name", None)
+        if self.rteb_dataset_name is None:
+            # Remove "RTEB" prefix from task name to get dataset name
+            self.rteb_dataset_name = self.metadata.name.replace("RTEB", "")
+
+        super().__init__(**kwargs)
+
+    def _validate_task_config(self):
+        """Validate task-specific configuration.
+
+        This method should be implemented by concrete subclasses to validate
+        their task-specific configuration.
+        """
+        """Validate task-specific configuration."""
+        if not self.rteb_data_path:
+            raise ValueError(
+                f"RTEB data path is required for {self.__class__.__name__}"
+            )
+        if not self.rteb_dataset_name:
+            raise ValueError(
+                f"RTEB dataset name is required for {self.__class__.__name__}"
+            )
+
+    def load_data(self, **kwargs):
+        """Mark data as loaded without actually loading it.
+
+        Data loading is handled by the RTEB runner during evaluation.
+        This method just marks the data as loaded to satisfy MTEB's checks.
+        """
+        if self.data_loaded:
+            return
+
+        # Validate task configuration
+        self._validate_task_config()
+
+        logger.info(
+            f"Data for {self.metadata.name} ({self.rteb_dataset_name}) will be loaded "
+            f"during evaluation by RTEB's runner from path: {self.rteb_data_path}."
+        )
         self.data_loaded = True
 
     def evaluate(
@@ -314,36 +334,32 @@ class AbsTaskRTEB(AbsTask):
         encode_kwargs: dict[str, Any] = {},
         **kwargs,
     ) -> dict[HFSubset, ScoresDict]:
-        retriever = RetrievalEvaluator(
-            retriever=model,
-            task_name=self.metadata.name,
-            encode_kwargs=encode_kwargs,
-            **kwargs,
-        )
+        """Evaluate the model using the RTEB task runner."""
+        if not self.data_loaded:
+            self.load_data()
 
+        # RTEB tasks handle subsets internally based on dataset name
         scores = {}
         hf_subsets = list(self.hf_subsets) if self.is_multilingual else ["default"]
         if subsets_to_run is not None:
             hf_subsets = [s for s in hf_subsets if s in subsets_to_run]
 
         for hf_subset in hf_subsets:
-            logger.info(f"Subset: {hf_subset}")
-
-            if hf_subset == "default":
-                corpus, queries, relevant_docs = (
-                    self.corpus[split],
-                    self.queries[split],
-                    self.relevant_docs[split],
-                )
-            else:
-                corpus, queries, relevant_docs = (
-                    self.corpus[hf_subset][split],
-                    self.queries[hf_subset][split],
-                    self.relevant_docs[hf_subset][split],
-                )
-            scores[hf_subset] = self._evaluate_subset(
-                retriever, corpus, queries, relevant_docs, hf_subset, **kwargs
+            logger.info(
+                f"Task: {self.metadata.name}, split: {split}, subset: {hf_subset}. Running..."
             )
+
+            scores[hf_subset] = RTEBTaskRunner.run_rteb_evaluation(
+                task_metadata=self.metadata,
+                rteb_data_path=self.rteb_data_path,
+                rteb_dataset_name=self.rteb_dataset_name,
+                model=model,
+                hf_subset=hf_subset,
+                is_multilingual=self.is_multilingual,
+                encode_kwargs=encode_kwargs,
+                **kwargs,
+            )
+
         return scores
 
     def _evaluate_subset(
@@ -498,38 +514,17 @@ class AbsTaskRTEB(AbsTask):
 def calculate_length(
     queries: dict[str, str], corpus: dict[str, str]
 ) -> tuple[list[int], list[int]]:
-    queries_lens = []
-    doc_lens = []
-    for query in queries.values():
-        if isinstance(query[0], str):
-            queries_lens.append(len(query))
-        else:
-            queries_lens.extend([len(turn) for turn in query])
-
-    for doc in corpus.values():
-        doc_lens.append(len(doc))
-
-    return doc_lens, queries_lens
+    """Calculate length of queries and documents."""
+    query_len = [len(query) for query in queries.values()]
+    doc_len = [len(doc) for doc in corpus.values()]
+    return query_len, doc_len
 
 
-def process_docs(
-    collection: dict[str, dict[str, dict[str, str] | str]], hf_subset: str, split: str
-) -> dict[str, str]:
-    """Collections can contain overlapping ids in different splits. Prepend split to avoid this"""
-    return {
-        f"{split}_{hf_subset}_{k}": v for k, v in collection[hf_subset][split].items()
-    }
+def process_docs(docs, hf_subset, split):
+    """Process documents for a specific subset and split."""
+    return docs[hf_subset][split] if hf_subset in docs else {}
 
 
-def process_relevant_docs(
-    collection: dict[str, dict[str, dict[str, dict[str, int]]]],
-    hf_subset: str,
-    split: str,
-) -> dict[str, dict[str, int]]:
-    """Collections can contain overlapping ids in different splits. Prepend split to avoid this"""
-    return_collection = {}
-    for query_id, relevant in collection[hf_subset][split].items():
-        return_collection[f"{split}_{hf_subset}_{query_id}"] = {
-            f"{split}_{hf_subset}_{doc_id}": value for doc_id, value in relevant.items()
-        }
-    return return_collection
+def process_relevant_docs(relevant_docs, hf_subset, split):
+    """Process relevant documents for a specific subset and split."""
+    return relevant_docs[hf_subset][split] if hf_subset in relevant_docs else {}
