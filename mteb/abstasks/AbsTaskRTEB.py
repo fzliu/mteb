@@ -357,6 +357,7 @@ class AbsTaskRTEB(AbsTask, abc.ABC):
                 hf_subset=hf_subset,
                 is_multilingual=self.is_multilingual,
                 encode_kwargs=encode_kwargs,
+                batch_size=16,
                 **kwargs,
             )
 

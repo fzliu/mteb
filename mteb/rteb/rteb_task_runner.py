@@ -133,11 +133,12 @@ class RTEBTaskRunner:
         model: MTEBEncoder,
         hf_subset: HFSubset,
         is_multilingual: bool,
+        batch_size: int = 32,
         **kwargs: Any,
     ) -> ScoresDict:
         """Runs the RTEB evaluation pipeline with pl.Trainer."""
         logger.info(
-            f"Starting RTEB evaluation via Manual Runner: {task_metadata.name} ({rteb_dataset_name})..."
+            f"Starting RTEB evaluation via PL Runner: {task_metadata.name} ({rteb_dataset_name})..."
         )
 
         if hasattr(model, "mteb_model_meta"):
@@ -167,6 +168,7 @@ class RTEBTaskRunner:
             model_name=model_name,
             save_embds=save_embds_flag,
             load_embds=load_embds_flag,
+            batch_size=batch_size,
         )
         rteb_encoder._trainer = trainer
 
@@ -175,7 +177,7 @@ class RTEBTaskRunner:
             save_path=kwargs.get(
                 "output_folder", f"results/rteb_output/{rteb_dataset_name}"
             ),
-            batch_size=kwargs.get("batch_size", 16),
+            batch_size=kwargs.get("batch_size", batch_size),
             embd_batch_size=kwargs.get("embd_batch_size", 128),
             num_workers=kwargs.get("num_workers", 0),
             embd_in_memory_threshold=kwargs.get("embd_in_memory_threshold", 100000),

@@ -93,7 +93,7 @@ class VoyageWrapper(Wrapper):
         self,
         sentences: list[str],
         *,
-        batch_size: int = 32,
+        batch_size: int = 16,
         **kwargs: Any,
     ) -> np.ndarray:
         input_type = None
@@ -124,13 +124,21 @@ class VoyageWrapper(Wrapper):
                 batch.append(sentences[index])
                 index += 1
 
-            embeddings.extend(
-                self._embed_func(
-                    texts=batch,
-                    model=self._model_name,
-                    input_type=input_type,
-                ).embeddings
-            )
+            with open(f"data_{batch_size}.txt", "a+") as f:
+                for line in batch:
+                    f.write(f"{line}\n")
+
+            embeddings = self._embed_func(
+                texts=batch,
+                model=self._model_name,
+                input_type=input_type,
+            ).embeddings
+
+            embeddings.extend(embeddings)
+
+            with open(f"embeddings_{batch_size}.txt", "a+") as f:
+                for line in embeddings:
+                    f.write(f"{line}\n")
 
         return np.array(embeddings)
 
