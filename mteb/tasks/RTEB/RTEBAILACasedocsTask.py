@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 from mteb.rteb.rteb_utils import create_rteb_task_metadata
@@ -47,13 +46,4 @@ class RTEBAILACasedocs(AbsTaskRTEB):
 
     def __init__(self, **kwargs):
         # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="AILACasedocs", **kwargs
-        )
+        super().__init__(rteb_dataset_name="AILACasedocs", **kwargs)

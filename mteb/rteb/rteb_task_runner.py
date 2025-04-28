@@ -11,12 +11,16 @@ from typing import Any
 import pytorch_lightning as pl
 import torch
 import torch.utils.data
+from torch.utils.data import DataLoader  # Keep Dataset import
 
+from mteb.abstasks import AbsTaskRTEB
 from mteb.abstasks.TaskMetadata import HFSubset, TaskMetadata
 from mteb.encoder_interface import Encoder as MTEBEncoder
 from mteb.encoder_interface import PromptType
-from mteb.load_results.task_results import ScoresDict
-from mteb.rteb.core.data import RetrieveDataModule
+from mteb.load_results.task_results import ScoresDict  # Added import
+from mteb.rteb.core.data import (
+    EmbeddingDataCollator,
+)  # Added imports
 from mteb.rteb.core.retriever import Retriever
 from mteb.rteb.retrieve import (
     CORPUS_EMBD_FILENAME,
@@ -27,7 +31,8 @@ from mteb.rteb.retrieve import (
 )
 from mteb.rteb.rteb_encoder_wrapper import (
     MTEBToRTEBEncoderWrapper,
-)  # Import the new wrapper file
+)
+from mteb.rteb.utils.data import EmptyDataset, JSONLDataset  # Added imports
 
 logger = logging.getLogger(__name__)
 
@@ -127,8 +132,8 @@ class RTEBTaskRunner:
 
     @staticmethod
     def run_rteb_evaluation(
+        task: AbsTaskRTEB,
         task_metadata: TaskMetadata,
-        rteb_data_path: str,
         rteb_dataset_name: str,
         model: MTEBEncoder,
         hf_subset: HFSubset,
@@ -173,7 +178,6 @@ class RTEBTaskRunner:
         rteb_encoder._trainer = trainer
 
         args = argparse.Namespace(
-            data_path=rteb_data_path,
             save_path=kwargs.get(
                 "output_folder", f"results/rteb_output/{rteb_dataset_name}"
             ),
@@ -207,40 +211,41 @@ class RTEBTaskRunner:
                     scores = json.load(f)
                 return scores
 
-        # 1. Load Data using RetrieveDataModule
+        # 1. Load Data using AbsTaskRTEB (already done by the task instance)
         try:
-            dataset_kwargs = {
-                "query_instruct": rteb_encoder.query_instruct,
-                "corpus_instruct": rteb_encoder.corpus_instruct,
-            }
-            dm = RetrieveDataModule(
-                data_path=args.data_path,
-                dataset_name=rteb_dataset_name,
+            query_dataloader = DataLoader(
+                task.queries["test"],
                 batch_size=args.batch_size,
                 num_workers=args.num_workers,
-                dataset_kwargs=dataset_kwargs,
-                collator_kwargs={},
+                collate_fn=None,
             )
+
+            corpus_dataloader = DataLoader(
+                task.corpus["test"],
+                batch_size=args.batch_size,
+                num_workers=args.num_workers,
+                collate_fn=None,
+            )
+
             if trainer.is_global_zero:
-                dm.prepare_data()
-                logger.info(f"Queries size: {len(dm.dataset.queries)}")
-                logger.info(f"Corpus size: {len(dm.dataset.corpus)}")
+                logger.info(f"Queries size: {len(task.queries['test'])}")
+                logger.info(f"Corpus size: {len(task.corpus['test'])}")
 
             trainer.strategy.barrier()  # Ensure data is prepared on all ranks
 
             if (
-                len(dm.dataset.queries) < trainer.num_devices
-                or len(dm.dataset.corpus) < trainer.num_devices
+                len(task.queries["test"]) < trainer.num_devices
+                or len(task.corpus["test"]) < trainer.num_devices
             ):
                 logger.warning("Skipping the task due to too few queries / documents.")
                 return {}
 
-            if len(dm.dataset.queries) >= 1e6:
+            if len(task.queries["test"]) >= 1e6:
                 logger.warning("Skipping the task due to too many queries.")
                 return {}
         except Exception as e:
             logger.error(
-                f"Failed to initialize or prepare RetrieveDataModule: {e}",
+                f"Failed to load data or create DataLoaders: {e}",
                 exc_info=True,
             )
             return {
@@ -261,54 +266,90 @@ class RTEBTaskRunner:
         # Encode Queries
         logger.info("Encoding queries")
         rteb_encoder.is_query = True
-        rteb_encoder.in_memory = len(dm.dataset.queries) < args.embd_in_memory_threshold
+        rteb_encoder.in_memory = (
+            len(task.queries["test"]) < args.embd_in_memory_threshold
+        )
         rteb_encoder.save_file = os.path.join(task_save_path, QUERIES_EMBD_FILENAME)
         if args.load_embds and rteb_encoder.embd_files_exist(trainer.num_devices):
             queries_embds_files = rteb_encoder.get_embd_files(trainer.num_devices)
             logger.info(f"Embedding files exist: {queries_embds_files}")
-            dm.set_queries_embds(queries_embds_files=queries_embds_files)
+            queries_embd_ds = JSONLDataset(
+                queries_embds_files
+            )  # Create dataset directly
         else:
             logger.info(f"in_memory = {rteb_encoder.in_memory}")
             logger.info(f"save_file = {rteb_encoder.save_file}")
-            trainer.predict(model=rteb_encoder, dataloaders=dm.queries_dataloader())
+            trainer.predict(
+                model=rteb_encoder, dataloaders=query_dataloader
+            )  # Use the new dataloader
             # Set the query embeddings
             queries_embds_files = rteb_encoder.get_embd_files()
             if rteb_encoder.in_memory:
-                dm.set_queries_embds(queries_embds=rteb_encoder.embds)
+                queries_embd_ds = EmptyDataset(
+                    rteb_encoder.embds
+                )  # Create dataset directly
             else:
-                dm.set_queries_embds(queries_embds_files=queries_embds_files)
+                queries_embd_ds = JSONLDataset(
+                    queries_embds_files
+                )  # Create dataset directly
         trainer.strategy.barrier()  # Ensure embeddings are ready on all ranks
+
+        # Create queries_embd_dataloader
+        queries_embd_dataloader = DataLoader(
+            queries_embd_ds,
+            batch_size=args.embd_batch_size,
+            num_workers=args.num_workers,
+            collate_fn=EmbeddingDataCollator(),
+        )
 
         # Encode Corpus
         logger.info("Encoding corpus")
         rteb_encoder.is_query = False
-        rteb_encoder.in_memory = len(dm.dataset.corpus) < args.embd_in_memory_threshold
+        rteb_encoder.in_memory = (
+            len(task.corpus["test"]) < args.embd_in_memory_threshold
+        )
         rteb_encoder.save_file = str(corpus_embds_file)
 
         if args.load_embds and corpus_embds_file.exists():
             if trainer.is_global_zero:
                 logger.info(f"Loading corpus embeddings from {corpus_embds_file}")
-            dm.set_corpus_embds(
-                corpus_embds_files=[str(corpus_embds_file)]
-            )  # Pass as list
+            corpus_embd_ds = JSONLDataset(
+                [str(corpus_embds_file)]
+            )  # Create dataset directly
         else:
             if trainer.is_global_zero:
                 logger.info(f"in_memory = {rteb_encoder.in_memory}")
                 logger.info(f"save_file = {rteb_encoder.save_file}")
-            trainer.predict(model=rteb_encoder, dataloaders=dm.corpus_dataloader())
+            trainer.predict(
+                model=rteb_encoder, dataloaders=corpus_dataloader
+            )  # Use the new dataloader
             if rteb_encoder.in_memory:
-                dm.set_corpus_embds(corpus_embds=rteb_encoder.embds)
+                corpus_embd_ds = EmptyDataset(
+                    rteb_encoder.embds
+                )  # Create dataset directly
             else:
-                dm.set_corpus_embds(corpus_embds_files=[str(corpus_embds_file)])
+                corpus_embd_ds = JSONLDataset(
+                    [str(corpus_embds_file)]
+                )  # Create dataset directly
 
         trainer.strategy.barrier()  # Ensure embeddings are ready on all ranks
+
+        # Create corpus_embd_dataloader
+        corpus_embd_dataloader = DataLoader(
+            corpus_embd_ds,
+            batch_size=args.embd_batch_size,
+            num_workers=args.num_workers,
+            collate_fn=EmbeddingDataCollator(),
+        )
 
         # 3. Manually Perform Retrieval
         logger.info("Retrieve")
         retriever_instance = Retriever(topk=100)  # Instantiate Retriever
-        retriever_instance.corpus_embd_dataloader = dm.corpus_embd_dataloader()
+        retriever_instance.corpus_embd_dataloader = (
+            corpus_embd_dataloader  # Use the new dataloader
+        )
         retriever_instance.in_memory = (
-            len(dm.dataset.queries) < args.embd_in_memory_threshold
+            len(task.queries["test"]) < args.embd_in_memory_threshold
         )
         retriever_instance.save_file = str(
             rteb_cache_path / RETRIEVE_PRED_FILENAME
@@ -316,7 +357,8 @@ class RTEBTaskRunner:
         retriever_instance.save_prediction = True  # Ensure prediction is saved
 
         trainer.predict(
-            model=retriever_instance, dataloaders=dm.queries_embd_dataloader()
+            model=retriever_instance,
+            dataloaders=queries_embd_dataloader,  # Use the new dataloader
         )
 
         # Remove the embeddings if not saving
@@ -330,7 +372,9 @@ class RTEBTaskRunner:
         rteb_scores = {}
         if trainer.is_global_zero:
             try:
-                relevance_data = dm.dataset.relevance
+                relevance_data = task.relevant_docs[
+                    "test"
+                ]  # Access relevance data directly
                 if not relevance_data:
                     logger.error("Ground truth relevance data not found or empty.")
                     raise ValueError("Relevance data is missing.")

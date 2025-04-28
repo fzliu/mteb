@@ -2,8 +2,9 @@ from __future__ import annotations
 
 import torch
 from pytorch_lightning import LightningDataModule
+from torch.utils.data import DataLoader
 
-from ..datasets import get_retrieval_dataset
+from ...abstasks import AbsTaskRTEB
 from ..utils.data import EmptyDataset, JSONLDataset
 
 
@@ -48,40 +49,37 @@ class RetrieveDataCollator:
 class RetrieveDataModule(LightningDataModule):
     def __init__(
         self,
-        data_path: str,
-        dataset_name: str,
+        task: AbsTaskRTEB,  # Accept AbsTaskRTEB instance
         batch_size: int = 32,
         embd_batch_size: int = 1024,
         num_workers: int = 4,
-        dataset_kwargs: dict | None = None,
         collator_kwargs: dict | None = None,
     ):
         super().__init__()
         self.batch_size = batch_size
         self.embd_batch_size = embd_batch_size
         self.num_workers = num_workers
-        self.dataset = get_retrieval_dataset(
-            data_path=data_path,
-            dataset_name=dataset_name,
-            **dataset_kwargs,
-        )
+        self.task = task  # Store the task instance
         self.query_collator = None
         self.corpus_collator = None
 
     def prepare_data(self):
-        self.dataset.prepare_data()
+        # Data is already loaded in the AbsTaskRTEB instance
+        pass
 
-    def queries_dataloader(self):
-        return torch.utils.data.DataLoader(
-            self.dataset.queries,
+    def queries_dataloader(self) -> DataLoader:
+        # Access queries directly from the task instance
+        return DataLoader(
+            self.task.queries["test"],  # Assuming 'test' split as used in AbsTaskRTEB
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             collate_fn=self.query_collator,
         )
 
-    def corpus_dataloader(self):
-        return torch.utils.data.DataLoader(
-            self.dataset.corpus,
+    def corpus_dataloader(self) -> DataLoader:
+        # Access corpus directly from the task instance
+        return DataLoader(
+            self.task.corpus["test"],  # Assuming 'test' split as used in AbsTaskRTEB
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             collate_fn=self.corpus_collator,
@@ -93,7 +91,9 @@ class RetrieveDataModule(LightningDataModule):
             self.queries_embd_ds = EmptyDataset(queries_embds)
         else:
             self.queries_embd_ds = JSONLDataset(queries_embds_files)
-        assert len(self.queries_embd_ds) == len(self.dataset.queries)
+        assert len(self.queries_embd_ds) == len(
+            self.task.queries["test"]
+        )  # Use task queries length
 
     def set_corpus_embds(self, corpus_embds=None, corpus_embds_files=None):
         if corpus_embds:
@@ -102,18 +102,18 @@ class RetrieveDataModule(LightningDataModule):
         else:
             self.corpus_embd_ds = JSONLDataset(corpus_embds_files)
         # TODO: check this assertion later, removed for chunk model
-        # assert len(self.corpus_embd_ds) == len(self.dataset.corpus)
+        # assert len(self.corpus_embd_ds) == len(self.task.corpus["test"]) # Use task corpus length
 
-    def queries_embd_dataloader(self):
-        return torch.utils.data.DataLoader(
+    def queries_embd_dataloader(self) -> DataLoader:
+        return DataLoader(
             self.queries_embd_ds,
             batch_size=self.embd_batch_size,
             num_workers=self.num_workers,
             collate_fn=EmbeddingDataCollator(),
         )
 
-    def corpus_embd_dataloader(self):
-        return torch.utils.data.DataLoader(
+    def corpus_embd_dataloader(self) -> DataLoader:
+        return DataLoader(
             self.corpus_embd_ds,
             batch_size=self.embd_batch_size,
             num_workers=self.num_workers,

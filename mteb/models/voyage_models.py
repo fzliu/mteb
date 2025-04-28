@@ -124,10 +124,6 @@ class VoyageWrapper(Wrapper):
                 batch.append(sentences[index])
                 index += 1
 
-            with open(f"data_{batch_size}.txt", "a+") as f:
-                for line in batch:
-                    f.write(f"{line}\n")
-
             embeddings = self._embed_func(
                 texts=batch,
                 model=self._model_name,
@@ -135,10 +131,6 @@ class VoyageWrapper(Wrapper):
             ).embeddings
 
             embeddings.extend(embeddings)
-
-            with open(f"embeddings_{batch_size}.txt", "a+") as f:
-                for line in embeddings:
-                    f.write(f"{line}\n")
 
         return np.array(embeddings)
 
