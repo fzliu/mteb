@@ -4,7 +4,6 @@ from __future__ import annotations
 import logging
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
-from mteb.rteb.rteb_utils import create_rteb_task_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +11,7 @@ logger = logging.getLogger(__name__)
 class RTEBAILACasedocs(AbsTaskRTEB):
     """RTEB task for the AILACasedocs dataset."""
 
-    metadata = create_rteb_task_metadata(
+    metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBAILACasedocs",
         description="RTEB evaluation for AILACasedocs dataset.",
         reference="https://zenodo.org/records/4063986",

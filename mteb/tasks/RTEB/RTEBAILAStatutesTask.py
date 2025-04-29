@@ -5,7 +5,6 @@ import logging
 import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
-from mteb.rteb.rteb_utils import create_rteb_task_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ logger = logging.getLogger(__name__)
 class RTEBAILAStatutes(AbsTaskRTEB):
     """RTEB task for the AILAStatutes dataset."""
 
-    metadata = create_rteb_task_metadata(
+    metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBAILAStatutes",
         description="RTEB evaluation for AILAStatutes dataset.",
         reference="https://zenodo.org/records/4063986",

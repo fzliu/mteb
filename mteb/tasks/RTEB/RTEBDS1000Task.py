@@ -5,7 +5,6 @@ import logging
 import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
-from mteb.rteb.rteb_utils import create_rteb_task_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ logger = logging.getLogger(__name__)
 class RTEBDS1000(AbsTaskRTEB):
     """RTEB task for the DS1000 dataset."""
 
-    metadata = create_rteb_task_metadata(
+    metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBDS1000",
         description="RTEB evaluation for DS1000 dataset.",
         reference=None,  # TODO: Add reference URL

@@ -5,7 +5,6 @@ import logging
 import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
-from mteb.rteb.rteb_utils import create_rteb_task_metadata
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ logger = logging.getLogger(__name__)
 class RTEBCOVID_QA(AbsTaskRTEB):
     """RTEB task for the COVID_QA dataset."""
 
-    metadata = create_rteb_task_metadata(
+    metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBCOVID_QA",
         description="RTEB evaluation for COVID_QA dataset.",
         reference=None,  # TODO: Add reference URL
