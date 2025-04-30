@@ -124,13 +124,13 @@ class VoyageWrapper(Wrapper):
                 batch.append(sentences[index])
                 index += 1
 
-            embeddings = self._embed_func(
-                texts=batch,
-                model=self._model_name,
-                input_type=input_type,
-            ).embeddings
-
-            embeddings.extend(embeddings)
+            embeddings.extend(
+                self._embed_func(
+                    texts=batch,
+                    model=self._model_name,
+                    input_type=input_type,
+                ).embeddings
+            )
 
         return np.array(embeddings)
 
