@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBHealthCareGerman(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBHealthCareGerman",
         "description": "RTEB evaluation for HealthCareGerman dataset.",
         "reference": "https://huggingface.co/datasets/thisserand/health_care_german",
         "dataset_path": "thisserand/health_care_german",

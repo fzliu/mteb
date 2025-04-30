@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBHumanEval(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBHumanEval",
         "description": "RTEB evaluation for HumanEval dataset.",
         "reference": "https://github.com/openai/human-eval",
         "dataset_path": "openai/openai_humaneval",

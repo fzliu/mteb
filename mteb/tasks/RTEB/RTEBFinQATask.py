@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBFinQA(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBFinQA",
         "description": "RTEB evaluation for FinQA dataset.",
         "reference": "https://finqasite.github.io/",
         "dataset_path": "ibm-research/finqa",
@@ -18,7 +19,7 @@ class RTEBFinQA(AbsTaskRTEB):
         "date": None,  # Original dataset had date (2021-09-01) but set to None for consistency
         "domains": ["Financial"],
         "task_subtypes": ["Question answering"],
-        "license": "MIT",  # Standardized license format
+        "license": "mit",  # Standardized license format
         "annotations_creators": "expert-annotated",
         "text_creation": "found",
         "bibtex_citation": """@article{chen2021finqa,

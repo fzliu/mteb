@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBFrenchBoolQ(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBFrenchBoolQ",
         "description": "RTEB evaluation for FrenchBoolQ dataset.",
         "reference": "https://github.com/google-research-datasets/boolean-questions",
         "dataset_path": "manu/french_boolq",

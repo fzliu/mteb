@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBAILACasedocs(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBAILACasedocs",
         "description": "RTEB evaluation for AILACasedocs dataset.",
         "reference": "https://zenodo.org/records/4063986",
         "dataset_path": "zenodo/4063986",  # Using Zenodo DOI as path
@@ -18,7 +19,7 @@ class RTEBAILACasedocs(AbsTaskRTEB):
         "date": None,  # Date not specified in dataset metadata
         "domains": ["Legal"],
         "task_subtypes": ["Article retrieval"],
-        "license": "CC-BY-4.0",  # Standardized license format
+        "license": "cc-by-4.0",  # Standardized license format
         "bibtex_citation": """@dataset{paheli_bhattacharya_2020_4063986,
   author       = {Paheli Bhattacharya and
                   Kripabandhu Ghosh and

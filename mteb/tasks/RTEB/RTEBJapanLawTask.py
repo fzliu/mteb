@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBJapanLaw(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBJapanLaw",
         "description": "RTEB evaluation for JapanLaw dataset.",
         "reference": "https://huggingface.co/datasets/y2lan/japan-law",
         "dataset_path": "TODO/JapanLaw",

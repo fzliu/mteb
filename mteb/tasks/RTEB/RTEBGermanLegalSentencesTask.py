@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBGermanLegalSentences(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBGermanLegalSentences",
         "description": "RTEB evaluation for GermanLegalSentences dataset.",
         "reference": "http://openlegaldata.io/",  # Open Legal Data source
         "dataset_path": "lavis-nlp/german_legal_sentences",

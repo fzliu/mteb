@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBHC3Finance(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBHC3Finance",
         "description": "RTEB evaluation for HC3Finance dataset.",
         "reference": "https://huggingface.co/datasets/Hello-SimpleAI/HC3",
         "dataset_path": "Atharva07/hc3_finance",

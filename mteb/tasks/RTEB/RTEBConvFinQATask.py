@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBConvFinQA(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBConvFinQA",
         "description": "RTEB evaluation for ConvFinQA dataset.",
         "reference": "https://github.com/czyssrs/ConvFinQA",
         "dataset_path": "FinGPT/fingpt-convfinqa",

@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBFiQAPersonalFinance(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBFiQAPersonalFinance",
         "description": "RTEB evaluation for FiQAPersonalFinance dataset.",
         "reference": "https://sites.google.com/view/fiqa/home",
         "dataset_path": "bilalRahib/fiqa-personal-finance-dataset",

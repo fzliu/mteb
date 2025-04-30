@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBTAT_QA(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBTAT_QA",
         "description": "RTEB evaluation for TAT_QA dataset.",
         "reference": "https://huggingface.co/datasets/next-tat/TAT-QA",
         "dataset_path": "next-tat/TAT-QA",
@@ -18,7 +19,7 @@ class RTEBTAT_QA(AbsTaskRTEB):
         "date": None,  # TAT-QA doesn't specify a date range
         "domains": ["Financial"],
         "task_subtypes": ["Question answering"],
-        "license": "CC-BY-SA-4.0",  # Standardized license format
+        "license": "cc-by-sa-4.0",  # Standardized license format
         "annotations_creators": "human-annotated",
         "text_creation": "found",
         "bibtex_citation": """unknown""",

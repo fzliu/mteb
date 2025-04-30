@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBFrenchOpenFiscalTexts(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBFrenchOpenFiscalTexts",
         "description": "RTEB evaluation for FrenchOpenFiscalTexts dataset.",
         "reference": "https://echanges.dila.gouv.fr/OPENDATA/JADE/",  # OPENDATA/JADE source
         "dataset_path": "StanBienaives/french-open-fiscal-texts",

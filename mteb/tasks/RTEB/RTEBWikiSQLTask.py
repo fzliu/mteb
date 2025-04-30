@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBWikiSQL(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBWikiSQL",
         "description": "RTEB evaluation for WikiSQL dataset.",
         "reference": "https://huggingface.co/datasets/Salesforce/wikisql",
         "dataset_path": "Salesforce/wikisql",

@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBDialogsumGerman(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBDialogsumGerman",
         "description": "RTEB evaluation for DialogsumGerman dataset.",
         "reference": "https://aclanthology.org/2021.findings-acl.449/",
         "dataset_path": "fathyshalab/Dialogsum-german",

@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBLegalQuAD(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBLegalQuAD",
         "description": "RTEB evaluation for LegalQuAD dataset.",
         "reference": "https://github.com/elenanereiss/LegalQuAD",
         "dataset_path": "elenanereiss/LegalQuAD",  # Updated from local path to HF path
@@ -18,7 +19,7 @@ class RTEBLegalQuAD(AbsTaskRTEB):
         "date": None,  # LegalQuAD doesn't have a specific date range
         "domains": ["Legal"],
         "task_subtypes": ["Question answering"],
-        "license": "CC-BY-NC-SA-4.0",  # Standardized license format
+        "license": "cc-by-nc-sa-4.0",  # Standardized license format
         "annotations_creators": "derived",
         "text_creation": "found",
         "bibtex_citation": """@inproceedings{reiss-etal-2021-legalquad,

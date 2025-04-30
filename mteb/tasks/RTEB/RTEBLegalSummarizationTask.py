@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBLegalSummarization(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBLegalSummarization",
         "description": "RTEB evaluation for LegalSummarization dataset.",
         "reference": "https://huggingface.co/datasets/mteb/legal_summarization",
         "dataset_path": "mteb/legal_summarization",
@@ -18,7 +19,7 @@ class RTEBLegalSummarization(AbsTaskRTEB):
         "date": None,  # No specific date range available
         "domains": ["Legal"],
         "task_subtypes": ["Article retrieval"],
-        "license": "CC-BY-SA-4.0",  # Standardized license format
+        "license": "cc-by-sa-4.0",  # Standardized license format
         "annotations_creators": "derived",
         "text_creation": "found",
         "bibtex_citation": """unknown""",

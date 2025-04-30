@@ -23,7 +23,6 @@ from mteb.encoder_interface import Encoder
 from mteb.load_results.task_results import ScoresDict
 
 from .AbsTask import AbsTask
-from .TaskMetadata import DescriptiveStatistics
 
 CORPUS_EMBD_FILENAME = "corpus_embds.jsonl"
 QUERIES_EMBD_FILENAME = "queries_embds.jsonl"
@@ -121,30 +120,6 @@ class HFDataLoader:
             trust_remote_code=self.trust_remote_code,
         )
         self.qrels = qrels_ds
-
-
-class RetrievalDescriptiveStatistics(DescriptiveStatistics):
-    """Descriptive statistics for Retrieval"""
-
-    num_samples: int
-    num_queries: int
-    num_documents: int
-    number_of_characters: int
-
-    min_document_length: int
-    average_document_length: float
-    max_document_length: int
-    unique_documents: int
-
-    min_query_length: int
-    average_query_length: float
-    max_query_length: int
-    unique_queries: int
-
-    min_relevant_docs_per_query: int
-    average_relevant_docs_per_query: float
-    max_relevant_docs_per_query: int
-    unique_relevant_docs: int
 
 
 def gather_list(data: list, num_devices: int):
@@ -322,20 +297,11 @@ class JSONLDataset(Dataset):
         return item
 
 
-class RTEBEncoder(LightningModule):
-    def __init__(
-        self,
-        save_embds: bool = False,
-        load_embds: bool = False,
-        **kwargs,
-    ):
-        super().__init__(**kwargs)
-        self._load_embds = load_embds
-        self._save_embds = save_embds
-        # Keep the embeddings in memory by default. Set it to False for large corpus.
-        self.in_memory = True
-        self.is_query = False
-        self.save_file = None
+class MTEBToRTEBEncoderWrapper(LightningModule):
+    """Acts as a PyTorch Lightning Module to wrap an MTEB Encoder,
+    replicating the necessary functionality of RTEB's Encoder class
+    for use with trainer.predict, but overriding __setattr__ to prevent recursion.
+    """
 
     @property
     def load_embds(self) -> bool:
@@ -396,41 +362,12 @@ class RTEBEncoder(LightningModule):
                 # rewrite the file
                 self.local_embd_file = open(self.local_embd_file_name, "w")
 
-    def predict_step(self, batch, batch_idx):
-        indices = batch["id"]
-
-        if self.load_embds and self.local_existing_ids:
-            masks = [id in self.local_existing_ids for id in indices]
-            num_existed = sum(masks)
-            if num_existed == len(indices):
-                return
-            elif num_existed > 0:
-                raise NotImplementedError(
-                    "Partial loading within batch is not supported yet."
-                )
-
-        embds = self._model(batch)
-
-        for idx, embd in zip(indices, embds):
-            obj = {"id": idx, "embd": embd}
-            if self.in_memory:
-                self.local_embds.append(obj)
-            if self.save_embds:
-                self.local_embd_file.write(json.dumps(obj) + "\n")
-
     def on_predict_epoch_end(self):
         if self.save_embds:
             self.local_embd_file.close()
         if self.in_memory:
             self.embds = gather_list(self.local_embds, self.trainer.num_devices)
         self.trainer.strategy.barrier()
-
-
-class MTEBToRTEBEncoderWrapper(RTEBEncoder):
-    """Acts as a PyTorch Lightning Module to wrap an MTEB Encoder,
-    replicating the necessary functionality of RTEB's Encoder class
-    for use with trainer.predict, but overriding __setattr__ to prevent recursion.
-    """
 
     def __init__(
         self,
@@ -442,7 +379,14 @@ class MTEBToRTEBEncoderWrapper(RTEBEncoder):
         batch_size: int = 16,
         **kwargs,
     ):
-        super().__init__(save_embds, load_embds, **kwargs)
+        super().__init__(**kwargs)
+        self._load_embds = load_embds
+        self._save_embds = save_embds
+        # Keep the embeddings in memory by default. Set it to False for large corpus.
+        self.in_memory = True
+        self.is_query = False
+        self.save_file = None
+
         self.mteb_model_instance = mteb_model
         self.model_name = model_name
         self.task_name = task_name
@@ -731,7 +675,6 @@ class AbsTaskRTEB(AbsTask):
         self,
         model: Encoder,
         hf_subset: HFSubset,
-        is_multilingual: bool,
         batch_size: int = 32,
         **kwargs: Any,
     ) -> ScoresDict:
@@ -785,7 +728,9 @@ class AbsTaskRTEB(AbsTask):
         )
         task_save_path = Path(args.save_path) / model_name
         task_save_path.mkdir(parents=True, exist_ok=True)
-        rteb_cache_path = Path(f"rteb_cache/{self.rteb_dataset_name}") / model_name
+        rteb_cache_path = Path(
+            f"{os.path.expanduser('~')}/.cache/rteb/{self.rteb_dataset_name}/{model_name}"
+        )
         rteb_cache_path.mkdir(parents=True, exist_ok=True)
 
         # Check if results already exist
@@ -1040,7 +985,9 @@ class AbsTaskRTEB(AbsTask):
                     except (ValueError, TypeError):
                         final_scores["main_score"] = 0.0
 
-                final_scores["hf_subset"] = hf_subset if is_multilingual else "default"
+                final_scores["hf_subset"] = (
+                    hf_subset if self.is_multilingual else "default"
+                )
                 final_scores["languages"] = self.metadata.eval_langs
 
                 with open(str(eval_file), "w") as f:
@@ -1055,7 +1002,7 @@ class AbsTaskRTEB(AbsTask):
                 rteb_scores = {
                     "main_score": 0.0,
                     self.metadata.main_score: 0.0,
-                    "hf_subset": hf_subset if is_multilingual else "default",
+                    "hf_subset": hf_subset if self.is_multilingual else "default",
                     "languages": self.metadata.eval_langs,
                 }
 
@@ -1073,7 +1020,7 @@ class AbsTaskRTEB(AbsTask):
                 rteb_scores = {
                     "main_score": 0.0,
                     self.metadata.main_score: 0.0,
-                    "hf_subset": hf_subset if is_multilingual else "default",
+                    "hf_subset": hf_subset if self.is_multilingual else "default",
                     "languages": self.metadata.eval_langs,
                 }
 

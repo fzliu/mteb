@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBJapaneseCoNaLa(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBJapaneseCoNaLa",
         "description": "RTEB evaluation for JapaneseCoNaLa dataset.",
         "reference": "https://huggingface.co/datasets/haih2/japanese-conala",
         "dataset_path": "haih2/japanese-conala",

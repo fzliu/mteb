@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBFinanceBench(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBFinanceBench",
         "description": "RTEB evaluation for FinanceBench dataset.",
         "reference": "https://github.com/patronus-ai/financebench",
         "dataset_path": "PatronusAI/financebench",

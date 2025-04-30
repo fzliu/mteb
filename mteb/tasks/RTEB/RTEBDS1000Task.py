@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBDS1000(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBDS1000",
         "description": "RTEB evaluation for DS1000 dataset.",
         "reference": "https://ds1000-code-gen.github.io/",
         "dataset_path": "xlangai/DS-1000",

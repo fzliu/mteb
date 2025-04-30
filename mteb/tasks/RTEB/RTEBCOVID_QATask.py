@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBCOVID_QA(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBCOVID_QA",
         "description": "RTEB evaluation for COVID_QA dataset.",
         "reference": "https://aclanthology.org/2020.nlpcovid19-acl.18/",
         "dataset_path": "castorini/covid_qa_castorini",

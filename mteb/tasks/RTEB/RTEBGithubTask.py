@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBGithub(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBGithub",
         "description": "RTEB evaluation for Github dataset.",
         "reference": "https://github.com/CoIR-team/coir",
         "dataset_path": "CoIR-team/Github",  # Updated from TODO placeholder

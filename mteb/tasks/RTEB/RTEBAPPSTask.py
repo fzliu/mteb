@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBAPPS(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBAPPS",
         "description": "RTEB evaluation for APPS dataset.",
         "reference": "https://arxiv.org/abs/2105.09938",
         "dataset_path": "CoIR-Retrieval/apps",

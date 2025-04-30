@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBFrenchTriviaQAWikicontext(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBFrenchTriviaQAWikicontext",
         "description": "RTEB evaluation for FrenchTriviaQAWikicontext dataset.",
         "reference": "https://www.cs.utexas.edu/~eunsol/files/papers/acl17jcwz.pdf",
         "dataset_path": "manu/french-trivia",

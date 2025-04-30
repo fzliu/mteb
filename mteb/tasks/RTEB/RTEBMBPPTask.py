@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBMBPP(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBMBPP",
         "description": "RTEB evaluation for MBPP dataset.",
         "reference": "https://huggingface.co/datasets/Muennighoff/mbpp",
         "dataset_path": "Muennighoff/mbpp",
@@ -18,7 +19,7 @@ class RTEBMBPP(AbsTaskRTEB):
         "date": None,  # MBPP doesn't have a specific date range
         "domains": ["Programming"],
         "task_subtypes": ["Code retrieval"],
-        "license": "CC-BY-SA-4.0",  # Standardized license format
+        "license": "cc-by-sa-4.0",  # Standardized license format
         "annotations_creators": "human-annotated",
         "text_creation": "found",
         "bibtex_citation": """@article{appel2022mbpp,

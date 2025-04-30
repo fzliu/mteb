@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class RTEBChatDoctor_HealthCareMagic(AbsTaskRTEB):
     _TASK_SPECIFIC_METADATA = {
+        "task_name": "RTEBChatDoctor_HealthCareMagic",
         "description": "RTEB evaluation for ChatDoctor_HealthCareMagic dataset.",
         "reference": "https://github.com/Kent0n-Li/ChatDoctor",
         "dataset_path": "lavita/ChatDoctor-HealthCareMagic-100k",
