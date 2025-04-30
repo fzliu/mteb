@@ -6,7 +6,6 @@ import logging
 import os
 from collections import OrderedDict, defaultdict
 from pathlib import Path
-from time import time
 from typing import Any
 
 import numpy as np
@@ -15,7 +14,7 @@ import torch
 import torch.distributed as dist
 from beir.retrieval.evaluation import EvaluateRetrieval
 from beir.retrieval.search.dense.util import cos_sim, dot_score
-from datasets import Value, load_dataset
+from datasets import DatasetDict, Value, load_dataset
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader, Dataset
 
@@ -730,8 +729,6 @@ class AbsTaskRTEB(AbsTask):
 
     def run_rteb_evaluation(
         self,
-        task_metadata: TaskMetadata,
-        rteb_dataset_name: str,
         model: Encoder,
         hf_subset: HFSubset,
         is_multilingual: bool,
@@ -740,7 +737,7 @@ class AbsTaskRTEB(AbsTask):
     ) -> ScoresDict:
         """Runs the RTEB evaluation pipeline with pl.Trainer."""
         logger.info(
-            f"Starting RTEB evaluation via PL Runner: {task_metadata.name} ({rteb_dataset_name})..."
+            f"Starting RTEB evaluation via PL Runner: {self.metadata.name} ({self.rteb_dataset_name})..."
         )
 
         if hasattr(model, "mteb_model_meta"):
@@ -766,7 +763,7 @@ class AbsTaskRTEB(AbsTask):
 
         rteb_encoder = MTEBToRTEBEncoderWrapper(
             model,
-            task_name=task_metadata.name,
+            task_name=self.metadata.name,
             model_name=model_name,
             save_embds=save_embds_flag,
             load_embds=load_embds_flag,
@@ -776,7 +773,7 @@ class AbsTaskRTEB(AbsTask):
 
         args = argparse.Namespace(
             save_path=kwargs.get(
-                "output_folder", f"results/rteb_output/{rteb_dataset_name}"
+                "output_folder", f"results/rteb_output/{self.rteb_dataset_name}"
             ),
             batch_size=kwargs.get("batch_size", batch_size),
             embd_batch_size=kwargs.get("embd_batch_size", 128),
@@ -788,7 +785,7 @@ class AbsTaskRTEB(AbsTask):
         )
         task_save_path = Path(args.save_path) / model_name
         task_save_path.mkdir(parents=True, exist_ok=True)
-        rteb_cache_path = Path(f"rteb_cache/{rteb_dataset_name}") / model_name
+        rteb_cache_path = Path(f"rteb_cache/{self.rteb_dataset_name}") / model_name
         rteb_cache_path.mkdir(parents=True, exist_ok=True)
 
         # Check if results already exist
@@ -796,7 +793,7 @@ class AbsTaskRTEB(AbsTask):
         if not args.overwrite and eval_file.exists():
             if trainer.is_global_zero:
                 logger.info(
-                    f"Results already exist for {task_metadata.name} at {eval_file}. Skipping."
+                    f"Results already exist for {self.metadata.name} at {eval_file}. Skipping."
                 )
                 with open(str(eval_file)) as f:
                     scores = json.load(f)
@@ -847,9 +844,9 @@ class AbsTaskRTEB(AbsTask):
             )
             return {
                 "main_score": 0.0,
-                task_metadata.main_score: 0.0,
+                self.metadata.main_score: 0.0,
                 "hf_subset": "default",
-                "languages": task_metadata.eval_langs,
+                "languages": self.metadata.eval_langs,
             }
 
         # 2. Encode Queries and Corpus using pl.Trainer
@@ -1002,7 +999,7 @@ class AbsTaskRTEB(AbsTask):
                 )
 
                 logger.info("-" * 40)
-                logger.info(f"Dataset: {rteb_dataset_name}")
+                logger.info(f"Dataset: {self.rteb_dataset_name}")
                 logger.info(f"Model: {model_name}")
                 logger.info(f"Save path: {task_save_path}")
                 logger.info("Retrieval evaluation:")
@@ -1010,16 +1007,16 @@ class AbsTaskRTEB(AbsTask):
 
                 # 5. Format and Save Results
                 mteb_scores = dict(rteb_scores)
-                if task_metadata.main_score not in mteb_scores:
+                if self.metadata.main_score not in mteb_scores:
                     logger.warning(
-                        f"Main score '{task_metadata.main_score}' not found in RTEB results."
+                        f"Main score '{self.metadata.main_score}' not found in RTEB results."
                     )
                     fallback_score = (
                         next(iter(mteb_scores.values()), 0.0) if mteb_scores else 0.0
                     )
                     mteb_scores["main_score"] = fallback_score
                 else:
-                    mteb_scores["main_score"] = mteb_scores[task_metadata.main_score]
+                    mteb_scores["main_score"] = mteb_scores[self.metadata.main_score]
 
                 mteb_scores["model_name"] = model_name
                 if rteb_encoder.embd_dim:
@@ -1044,7 +1041,7 @@ class AbsTaskRTEB(AbsTask):
                         final_scores["main_score"] = 0.0
 
                 final_scores["hf_subset"] = hf_subset if is_multilingual else "default"
-                final_scores["languages"] = task_metadata.eval_langs
+                final_scores["languages"] = self.metadata.eval_langs
 
                 with open(str(eval_file), "w") as f:
                     json.dump(final_scores, f)
@@ -1057,9 +1054,9 @@ class AbsTaskRTEB(AbsTask):
                 )
                 rteb_scores = {
                     "main_score": 0.0,
-                    task_metadata.main_score: 0.0,
+                    self.metadata.main_score: 0.0,
                     "hf_subset": hf_subset if is_multilingual else "default",
-                    "languages": task_metadata.eval_langs,
+                    "languages": self.metadata.eval_langs,
                 }
 
         trainer.strategy.barrier()  # Ensure global zero finishes saving before other ranks proceeds
@@ -1075,12 +1072,12 @@ class AbsTaskRTEB(AbsTask):
                 )
                 rteb_scores = {
                     "main_score": 0.0,
-                    task_metadata.main_score: 0.0,
+                    self.metadata.main_score: 0.0,
                     "hf_subset": hf_subset if is_multilingual else "default",
-                    "languages": task_metadata.eval_langs,
+                    "languages": self.metadata.eval_langs,
                 }
 
-        logger.info(f"Finished RTEB evaluation for {task_metadata.name}.")
+        logger.info(f"Finished RTEB evaluation for {self.metadata.name}.")
         return rteb_scores
 
     def evaluate(
@@ -1108,13 +1105,8 @@ class AbsTaskRTEB(AbsTask):
             )
 
             scores[hf_subset] = self.run_rteb_evaluation(
-                task_metadata=self.metadata,
-                corpus=self.corpus,
-                queries=self.queries,
-                rteb_dataset_name=self.rteb_dataset_name,
                 model=model,
                 hf_subset=hf_subset,
-                is_multilingual=self.is_multilingual,
                 encode_kwargs=encode_kwargs,
                 batch_size=16,
                 **kwargs,
@@ -1123,103 +1115,48 @@ class AbsTaskRTEB(AbsTask):
         return scores
 
     def _evaluate_subset(
-        self, retriever, corpus, queries, relevant_docs, hf_subset: str, **kwargs
-    ) -> ScoresDict:
+        self,
+        model: Encoder,
+        data_split: DatasetDict | Dataset,
+        encode_kwargs: dict[str, Any],
+        **kwargs: Any,
+    ):
         """Evaluate a subset of the dataset.
 
-        This method is required by the base AbsTask class, but the actual evaluation
-        logic is delegated to RTEBTaskRunner.run_rteb_evaluation.
+        Warning:
+            This method is deprecated and will be removed in future versions.
+            Use RTEBTaskRunner.run_rteb_evaluation for evaluation logic.
+
+        Delegates to the parent class implementation while issuing a deprecation warning.
         """
-        # This method is not used directly in the current implementation
-        # as evaluation is delegated to RTEBTaskRunner.
-        # However, it must be implemented as it's an abstract method in AbsTask.
-        # A minimal implementation that raises NotImplementedError or logs a warning
-        # could be used, but keeping the original structure might be safer
-        # if there are other parts of the codebase that might still call it.
-        # For now, I will restore the original implementation.
+        import warnings
 
-        start_time = time()
-        results = retriever(corpus, queries)
-        end_time = time()
-        logger.info(f"Time taken to retrieve: {end_time - start_time:.2f} seconds")
-
-        save_predictions = kwargs.get("save_predictions", False)
-        export_errors = kwargs.get("export_errors", False)
-        if save_predictions or export_errors:
-            output_folder = Path(kwargs.get("output_folder", "results"))
-            if not os.path.isdir(output_folder):
-                os.makedirs(output_folder)
-
-        if save_predictions:
-            top_k = kwargs.get("top_k", None)
-            if top_k is not None:
-                for qid in list(results.keys()):
-                    doc_ids = set(
-                        sorted(
-                            results[qid], key=lambda x: results[qid][x], reverse=True
-                        )[:top_k]
-                    )
-                    results[qid] = {
-                        k: v for k, v in results[qid].items() if k in doc_ids
-                    }
-            qrels_save_path = (
-                output_folder / f"{self.metadata.name}_{hf_subset}_predictions.json"
-            )
-
-            with open(qrels_save_path, "w") as f:
-                json.dump(results, f)
-
-        ndcg, _map, recall, precision, naucs = retriever.evaluate(
-            relevant_docs,
-            results,
-            retriever.k_values,
-            ignore_identical_ids=self.ignore_identical_ids,
+        warnings.warn(
+            "_evaluate_subset is deprecated for RTEB tasks. Use RTEBTaskRunner.run_rteb_evaluation instead.",
+            DeprecationWarning,
+            stacklevel=2,
         )
-        mrr, naucs_mrr = retriever.evaluate_custom(
-            relevant_docs, results, retriever.k_values, "mrr"
-        )
-        scores = {
-            **{f"ndcg_at_{k.split('@')[1]}": v for (k, v) in ndcg.items()},
-            **{f"map_at_{k.split('@')[1]}": v for (k, v) in _map.items()},
-            **{f"recall_at_{k.split('@')[1]}": v for (k, v) in recall.items()},
-            **{f"precision_at_{k.split('@')[1]}": v for (k, v) in precision.items()},
-            **{f"mrr_at_{k.split('@')[1]}": v for (k, v) in mrr.items()},
-            **{
-                k.replace("@", "_at_").replace("_P", "_precision").lower(): v
-                for k, v in naucs.items()
-            },
-            **{
-                k.replace("@", "_at_").replace("_P", "_precision").lower(): v
-                for k, v in naucs_mrr.items()
-            },
-        }
-        self._add_main_score(scores)
+        return super()._evaluate_subset(model, data_split, encode_kwargs, **kwargs)
 
-        if export_errors:  # TODO
-            top_k = kwargs.get("top_k", 1)
-            if not save_predictions and top_k == 1:
-                for qid in results.keys():
-                    doc_scores = results[qid]
-                    sorted_docs = sorted(
-                        doc_scores.items(), key=lambda x: x[1], reverse=True
-                    )[:top_k]
-                    results[qid] = dict(sorted_docs)
-
-    def _calculate_metrics_from_split(self, split):
+    def _calculate_metrics_from_split(
+        self, split: str, hf_subset: str | None = None, compute_overall: bool = False
+    ):
         """Calculate metrics for a given split.
 
-        This method is required by the base AbsTask class, but the actual metric
-        calculation is handled within RTEBTaskRunner.run_rteb_evaluation.
-        A minimal implementation that raises NotImplementedError or logs a warning
-        could be used, but keeping the original structure might be safer
-        if there are other parts of the codebase that might still call it.
-        For now, I will restore a placeholder implementation.
+        Note:
+            This method exists only for API compatibility. Actual metric calculation
+            happens in RTEBTaskRunner.run_rteb_evaluation. This implementation:
+            1. Logs a warning when called
+            2. Returns empty ScoresDict to satisfy interface requirements
+
+        Parameters:
+            split: Dataset split to evaluate (e.g., 'test')
+            hf_subset: Optional Hugging Face dataset subset name
+            compute_overall: Whether to compute overall metrics across subsets
+
+        Returns:
+            ScoresDict: Empty dictionary to maintain interface compatibility
         """
-        # This method is not used directly in the current implementation
-        # as metric calculation is delegated to RTEBTaskRunner.
-        # However, it must be implemented as it's an abstract method in AbsTask.
-        # Returning an empty ScoresDict or raising NotImplementedError are options.
-        # For now, returning an empty ScoresDict to satisfy the abstract method requirement.
         logger.warning(
             f"_calculate_metrics_from_split called for split {split}, but metrics are calculated by RTEBTaskRunner."
         )
