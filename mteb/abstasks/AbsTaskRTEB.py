@@ -39,7 +39,6 @@ class HFDataLoader:
     def __init__(
         self,
         hf_repo: str | None = None,
-        hf_repo_qrels: str | None = None,
         streaming: bool = False,
         keep_in_memory: bool = False,
         trust_remote_code: bool = False,
@@ -50,18 +49,13 @@ class HFDataLoader:
         self.queries = {}
         self.qrels = {}
         self.hf_repo = hf_repo
-        # By default fetch qrels from same repo not a second repo with "-qrels" like in original
-        self.hf_repo_qrels = hf_repo_qrels if hf_repo_qrels else hf_repo
+        self.hf_repo_qrels = hf_repo  # Always use same repo
 
         self.streaming = streaming
         self.keep_in_memory = keep_in_memory
         self.trust_remote_code = trust_remote_code
 
         self.token = token or os.environ["HF_TOKEN"]
-
-    @staticmethod
-    def check(fIn: str, ext: str):
-        pass  # REMOVED original implementation
 
     def load(
         self, split="test"
@@ -99,35 +93,25 @@ class HFDataLoader:
 
         return self.corpus, self.queries, qrels_dict  # Return qrels_dict
 
-    def _load_corpus(self):
-        corpus_ds = load_dataset(
+    def _load_dataset(self, dataset_type: str):
+        """Helper to load and standardize datasets"""
+        ds = load_dataset(
             self.hf_repo,
-            "corpus",
+            dataset_type,
             keep_in_memory=self.keep_in_memory,
             streaming=self.streaming,
             trust_remote_code=self.trust_remote_code,
         )
-        corpus_ds = next(iter(corpus_ds.values()))  # get first split
-        corpus_ds = corpus_ds.cast_column("id", Value("string"))
-        corpus_ds = corpus_ds.remove_columns(
-            [col for col in corpus_ds.column_names if col not in ["id", "text"]]
+        ds = next(iter(ds.values()))  # get first split
+        return ds.cast_column("id", Value("string")).remove_columns(
+            [col for col in ds.column_names if col not in ["id", "text"]]
         )
-        self.corpus = corpus_ds
+
+    def _load_corpus(self):
+        self.corpus = self._load_dataset("corpus")
 
     def _load_queries(self):
-        queries_ds = load_dataset(
-            self.hf_repo,
-            "queries",
-            keep_in_memory=self.keep_in_memory,
-            streaming=self.streaming,
-            trust_remote_code=self.trust_remote_code,
-        )
-        queries_ds = next(iter(queries_ds.values()))  # get first split
-        queries_ds = queries_ds.cast_column("id", Value("string"))
-        queries_ds = queries_ds.remove_columns(
-            [col for col in queries_ds.column_names if col not in ["id", "text"]]
-        )
-        self.queries = queries_ds
+        self.queries = self._load_dataset("queries")
 
     def _load_qrels(self, split):
         qrels_ds = load_dataset(
@@ -170,8 +154,7 @@ def gather_list(data: list, num_devices: int):
         return data
     gathered = [None] * num_devices
     dist.all_gather_object(gathered, data)
-    gathered = sum(gathered, [])
-    return gathered
+    return sum(gathered, [])
 
 
 def run_retrieve_evaluation(relevance, prediction):
@@ -319,18 +302,13 @@ class JSONLDataset(Dataset):
         self.transform = transform
         self.data = []
 
-        # Load data from JSONL file
-        if isinstance(file_path, str):
-            with open(file_path) as f:
+        # Always convert to list for uniform processing
+        file_paths = [file_path] if isinstance(file_path, str) else file_path
+
+        for path in file_paths:
+            with open(path) as f:
                 for line in f:
                     self.data.append(json.loads(line))
-        elif isinstance(file_path, list):
-            for path in file_path:
-                with open(path) as f:
-                    for line in f:
-                        self.data.append(json.loads(line))
-        else:
-            raise ValueError("file_path must be a string or a list of strings.")
 
     def __len__(self):
         return len(self.data)
@@ -1246,60 +1224,3 @@ class AbsTaskRTEB(AbsTask):
             f"_calculate_metrics_from_split called for split {split}, but metrics are calculated by RTEBTaskRunner."
         )
         return ScoresDict()
-
-
-def calculate_length(
-    corpus: dict[str, dict[str, str]], queries: dict[str, list[str] | str]
-) -> RetrievalDescriptiveStatistics:
-    """Calculate descriptive statistics for a retrieval dataset."""
-    num_queries = sum(len(q) for q in queries.values())
-    num_documents = sum(len(c) for c in corpus.values())
-    num_samples = num_queries + num_documents
-
-    all_documents = [doc for split in corpus.values() for doc in split.values()]
-    all_queries = [query for split in queries.values() for query in split.values()]
-
-    document_lengths = [len(doc) for doc in all_documents]
-    query_lengths = [len(query) for query in all_queries]
-
-    min_document_length = min(document_lengths) if document_lengths else 0
-    average_document_length = (
-        sum(document_lengths) / len(document_lengths) if document_lengths else 0
-    )
-    max_document_length = max(document_lengths) if document_lengths else 0
-    unique_documents = len(set(all_documents))
-
-    min_query_length = min(query_lengths) if query_lengths else 0
-    average_query_length = (
-        sum(query_lengths) / len(query_lengths) if query_lengths else 0
-    )
-    max_query_length = max(query_lengths) if query_lengths else 0
-    unique_queries = len(set(all_queries))
-
-    # This part requires relevance data, which is not available in this function
-    # Setting to default values for now
-    min_relevant_docs_per_query = 0
-    average_relevant_docs_per_query = 0.0
-    max_relevant_docs_per_query = 0
-    unique_relevant_docs = 0
-
-    number_of_characters = sum(document_lengths) + sum(query_lengths)
-
-    return RetrievalDescriptiveStatistics(
-        num_samples=num_samples,
-        num_queries=num_queries,
-        num_documents=num_documents,
-        number_of_characters=number_of_characters,
-        min_document_length=min_document_length,
-        average_document_length=average_document_length,
-        max_document_length=max_document_length,
-        unique_documents=unique_documents,
-        min_query_length=min_query_length,
-        average_query_length=average_query_length,
-        max_query_length=max_query_length,
-        unique_queries=unique_queries,
-        min_relevant_docs_per_query=min_relevant_docs_per_query,
-        average_relevant_docs_per_query=average_relevant_docs_per_query,
-        max_relevant_docs_per_query=max_relevant_docs_per_query,
-        unique_relevant_docs=unique_relevant_docs,
-    )
