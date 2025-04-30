@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for APPS
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -18,11 +16,9 @@ class RTEBAPPS(AbsTaskRTEB):
         reference="https://arxiv.org/abs/2105.09938",
         dataset_path="CoIR-Retrieval/apps",
         dataset_revision="f22508f96b7a36c2415181ed8bb76f76e04ae2d5",
-        eval_langs=["eng-Latn", "python-Code"],
         main_score="ndcg_at_10",
-        revision="1.0.1",  # Increment revision for this refactoring
+        revision="1.0.1",
         date=("2021-05-20", "2021-05-20"),
-        domains=["Programming", "Written"],
         task_subtypes=["Code retrieval"],
         license="mit",
         annotations_creators="derived",
@@ -38,14 +34,4 @@ class RTEBAPPS(AbsTaskRTEB):
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="APPS", **kwargs
-        )
+        super().__init__(rteb_dataset_name="APPS", **kwargs)

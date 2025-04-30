@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for FinQA
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,28 +13,26 @@ class RTEBFinQA(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBFinQA",
         description="RTEB evaluation for FinQA dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/FinQA",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["eng-Latn"],  # From text.py groups
+        reference="https://finqasite.github.io/",
+        dataset_path="ibm-research/finqa",
+        dataset_revision="main",
+        eval_langs=["eng-Latn"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=("2021-09-01", "2021-09-01"),
+        domains=["Financial"],
+        task_subtypes=["Question answering"],
+        license="mit",
+        annotations_creators="expert-annotated",
+        text_creation="found",
+        bibtex_citation="""@article{chen2021finqa,
+  title={FinQA: A Dataset of Numerical Reasoning over Financial Data},
+  author={Chen, Wenhu and Chen, Zhiyu and Wang, Chuhan and Zhang, Xinyi and Zhang, Yuchi and Smrz, Pavel and Yu, Xiangyu and Fung, Pascale},
+  journal={arXiv preprint arXiv:2109.00122},
+  year={2021}
+}""",
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="FinQA", **kwargs
-        )
+        super().__init__(rteb_dataset_name="FinQA", **kwargs)

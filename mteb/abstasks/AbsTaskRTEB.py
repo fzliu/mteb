@@ -15,7 +15,7 @@ import torch
 import torch.distributed as dist
 from beir.retrieval.evaluation import EvaluateRetrieval
 from beir.retrieval.search.dense.util import cos_sim, dot_score
-from datasets import Features, Value, load_dataset
+from datasets import Value, load_dataset
 from pytorch_lightning import LightningModule
 from torch.utils.data import DataLoader, Dataset
 
@@ -131,19 +131,12 @@ class HFDataLoader:
 
     def _load_qrels(self, split):
         qrels_ds = load_dataset(
-            self.hf_repo_qrels,
+            self.hf_repo,
+            "default",
             keep_in_memory=self.keep_in_memory,
             streaming=self.streaming,
             trust_remote_code=self.trust_remote_code,
-        )[split]
-        features = Features(
-            {
-                "query-id": Value("string"),
-                "corpus-id": Value("string"),
-                "score": Value("float"),
-            }
         )
-        qrels_ds = qrels_ds.cast(features)
         self.qrels = qrels_ds
 
 

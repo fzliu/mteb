@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for AILAStatutes
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -18,10 +16,8 @@ class RTEBAILAStatutes(AbsTaskRTEB):
         reference="https://zenodo.org/records/4063986",
         dataset_path="mteb/AILA_statutes",
         dataset_revision="ebfcd844eadd3d667efa3c57fc5c8c87f5c2867e",
-        eval_langs=["eng-Latn"],
         main_score="ndcg_at_10",
-        revision="1.0.1",  # Increment revision for this refactoring
-        domains=["Legal", "Written"],
+        revision="1.0.1",
         task_subtypes=["Article retrieval"],
         license="cc-by-4.0",
         annotations_creators="derived",
@@ -45,14 +41,4 @@ class RTEBAILAStatutes(AbsTaskRTEB):
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="AILAStatutes", **kwargs
-        )
+        super().__init__(rteb_dataset_name="AILAStatutes", **kwargs)

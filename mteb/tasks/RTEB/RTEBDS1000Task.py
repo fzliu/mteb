@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for DS1000
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,28 +13,26 @@ class RTEBDS1000(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBDS1000",
         description="RTEB evaluation for DS1000 dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/DS1000",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["eng-Latn"],  # From text.py groups
+        reference="https://ds1000-code-gen.github.io/",
+        dataset_path="xlangai/DS-1000",
+        dataset_revision="main",
+        eval_langs=["eng-Latn", "python-Code"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=("2022-11-18", "2022-11-18"),
+        domains=["Programming"],
+        task_subtypes=["Code retrieval"],
+        license="cc-by-sa-4.0",
+        annotations_creators="human-annotated",
+        text_creation="found",
+        bibtex_citation="""@article{luo2022ds,
+  title={DS-1000: A Natural and Reliable Benchmark for Data Science Code Generation},
+  author={Luo, Zhoujun and Wang, Chong and Wang, Shangqing and Xia, Han and Zhang, Yuyao and Yu, Shujie and Yin, Hailian and Li, Shi Han and Lai, Binyuan and Chen, Xuanlin and others},
+  journal={arXiv preprint arXiv:2211.11501},
+  year={2022}
+}""",
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="DS1000", **kwargs
-        )
+        super().__init__(rteb_dataset_name="DS1000", **kwargs)

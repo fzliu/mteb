@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for LegalSummarization
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,30 +13,23 @@ class RTEBLegalSummarization(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBLegalSummarization",
         description="RTEB evaluation for LegalSummarization dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/LegalSummarization",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["eng-Latn"],  # From text.py groups
+        reference="https://huggingface.co/datasets/mteb/legal_summarization",
+        dataset_path="mteb/legal_summarization",
+        dataset_revision="main",
+        eval_langs=["eng-Latn"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        domains=["Legal"],
+        task_subtypes=["Article retrieval"],
+        license="cc-by-sa-4.0",
+        annotations_creators="derived",
+        text_creation="found",
+        bibtex_citation="""unknown""",
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
         super().__init__(
-            rteb_data_path=rteb_data_path,
             rteb_dataset_name="LegalSummarization",
             **kwargs,
         )

@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for Github
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,28 +13,29 @@ class RTEBGithub(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBGithub",
         description="RTEB evaluation for Github dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/Github",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["eng-Latn"],  # Assuming English based on name
+        reference="https://github.com/CoIR-team/coir",
+        dataset_path="TODO/Github",
+        dataset_revision="main",
+        eval_langs=["eng-Latn", "python-Code"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=("2024-07-03", "2024-07-03"),
+        domains=["Programming"],
+        task_subtypes=["Code retrieval"],
+        license="apache-2.0",
+        annotations_creators="derived",
+        text_creation="found",
+        bibtex_citation="""@misc{li2024coircomprehensivebenchmarkcode,
+      title={CoIR: A Comprehensive Benchmark for Code Information Retrieval Models},
+      author={Xiangyang Li and Kuicai Dong and Yi Quan Lee and Wei Xia and Hao Zhang and Xinyi Dai and Yasheng Wang and Ruiming Tang},
+      year={2024},
+      eprint={2407.02883},
+      archivePrefix={arXiv},
+      primaryClass={cs.IR},
+      url={https://arxiv.org/abs/2407.02883},
+}""",  # Bibtex from the CoIR paper
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="Github", **kwargs
-        )
+        super().__init__(rteb_dataset_name="Github", **kwargs)

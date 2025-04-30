@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for FrenchOpenFiscalTexts
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,34 +13,27 @@ class RTEBFrenchOpenFiscalTexts(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBFrenchOpenFiscalTexts",
         description="RTEB evaluation for FrenchOpenFiscalTexts dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset_path="TODO/FrenchOpenFiscalTexts",  # TODO: Verify HF path or if local only
-        dataset_revision="main",  # TODO: Verify revision
-        eval_langs=["fra-Latn"],  # Assuming French based on name
+        reference="https://echanges.dila.gouv.fr/OPENDATA/JADE/",  # OPENDATA/JADE source
+        dataset_path="StanBienaives/french-open-fiscal-texts",
+        dataset_revision="main",
         main_score="ndcg_at_10",
-        revision="1.0.1",  # Increment revision for this refactoring
-        date=("YYYY-MM-DD", "YYYY-MM-DD"),  # TODO: Add date range
-        domains=["Legal", "Finance"],  # Assuming Legal and Finance based on name
-        task_subtypes=[],
-        license="unknown",  # TODO: Add license
+        revision="1.0.1",
+        date=(
+            "2000-01-01",
+            "2023-12-31",
+        ),  # Assuming a broad date range for case law data
+        domains=["Legal", "Financial"],
+        task_subtypes=["Article retrieval"],
+        license="not specified",
         annotations_creators="derived",
         dialect=[],
         text_creation="found",
-        bibtex_citation="""TODO: Add bibtex citation""",
+        bibtex_citation="""unknown""",
         modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
         super().__init__(
-            rteb_data_path=rteb_data_path,
             rteb_dataset_name="FrenchOpenFiscalTexts",
             **kwargs,
         )

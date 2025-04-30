@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for JapanLaw
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,28 +13,21 @@ class RTEBJapanLaw(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBJapanLaw",
         description="RTEB evaluation for JapanLaw dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/JapanLaw",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["jpn-Jpan"],  # Assuming Japanese based on name
+        reference="https://huggingface.co/datasets/y2lan/japan-law",
+        dataset_path="TODO/JapanLaw",
+        dataset_revision="main",
+        eval_langs=["jpn-Jpan"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=None,
+        domains=["Legal"],
+        task_subtypes=["Article retrieval"],
+        license="mit",
+        annotations_creators="human-annotated",
+        text_creation="found",
+        bibtex_citation="""unknown""",
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="JapanLaw", **kwargs
-        )
+        super().__init__(rteb_dataset_name="JapanLaw", **kwargs)

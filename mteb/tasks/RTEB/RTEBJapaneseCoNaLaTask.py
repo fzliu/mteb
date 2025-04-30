@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for JapaneseCoNaLa
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,28 +13,24 @@ class RTEBJapaneseCoNaLa(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBJapaneseCoNaLa",
         description="RTEB evaluation for JapaneseCoNaLa dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/JapaneseCoNaLa",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["jpn-Jpan"],  # Assuming Japanese based on name
+        reference="https://huggingface.co/datasets/haih2/japanese-conala",
+        dataset_path="haih2/japanese-conala",
+        dataset_revision="main",  # Assuming main based on HF page
+        eval_langs=[
+            "jpn-Jpan",
+            "python-Code",
+        ],  # Including python-Code as it's a code generation dataset
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=None,
+        domains=["Programming"],
+        task_subtypes=["Code retrieval"],
+        license="not specified",
+        annotations_creators="derived",
+        text_creation="found",
+        bibtex_citation="""unknown""",
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="JapaneseCoNaLa", **kwargs
-        )
+        super().__init__(rteb_dataset_name="JapaneseCoNaLa", **kwargs)

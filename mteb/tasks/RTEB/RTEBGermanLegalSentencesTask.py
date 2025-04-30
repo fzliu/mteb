@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,30 +14,25 @@ class RTEBGermanLegalSentences(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBGermanLegalSentences",
         description="RTEB evaluation for GermanLegalSentences dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/GermanLegalSentences",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["deu-Latn"],  # Assuming German based on name
+        reference="http://openlegaldata.io/",  # Open Legal Data source
+        dataset_path="lavis-nlp/german_legal_sentences",
+        dataset_revision="main",
+        eval_langs=["deu-Latn"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=None,
+        domains=["Legal"],
+        task_subtypes=["Article retrieval"],
+        license="not specified",  # TODO: Verify license
+        annotations_creators="LM-generated",
+        text_creation="found",
+        bibtex_citation="""unknown""",  # TODO: Add bibtex citation
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
         # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
         super().__init__(
-            rteb_data_path=rteb_data_path,
             rteb_dataset_name="GermanLegalSentences",
             **kwargs,
         )

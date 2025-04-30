@@ -1,8 +1,6 @@
-# Concrete RTEB task definition for HumanEval
 from __future__ import annotations
 
 import logging
-import os
 
 from mteb.abstasks.AbsTaskRTEB import AbsTaskRTEB
 
@@ -15,28 +13,26 @@ class RTEBHumanEval(AbsTaskRTEB):
     metadata = AbsTaskRTEB.create_rteb_task_metadata(
         task_name="RTEBHumanEval",
         description="RTEB evaluation for HumanEval dataset.",
-        reference=None,  # TODO: Add reference URL
-        dataset={
-            "path": "TODO/HumanEval",  # TODO: Verify HF path or if local only
-            "revision": "main",  # TODO: Verify revision
-        },
-        type="Retrieval",
-        category="s2p",
-        eval_splits=["test"],
-        eval_langs=["eng-Latn"],  # Assuming English based on name
+        reference="https://github.com/openai/human-eval",
+        dataset_path="openai/openai_humaneval",
+        dataset_revision="main",
+        eval_langs=["eng-Latn", "python-Code"],
         main_score="ndcg_at_10",
         revision="1.0.1",
+        date=("2021-01-01", "2021-12-31"),
+        domains=["Programming"],
+        task_subtypes=["Code retrieval"],
+        license="mit",
+        annotations_creators="human-annotated",
+        text_creation="found",
+        bibtex_citation="""@article{chen2021evaluating,
+  title={Evaluating Large Language Models Trained on Code},
+  author={Chen, Mark and Tworek, Jerry and Jun, Heewoo and Schoelkopf, Qinyuan and Le, Shi Yusong and Stevens, Foster and Ray, Aditya and Puri, Vijay and Agarwal, Rishabh and Fernandez, Lazar and others},
+  journal={arXiv preprint arXiv:2107.03374},
+  year={2021}
+}""",
+        modalities=["text"],
     )
 
     def __init__(self, **kwargs):
-        # Allow configuration via environment variable or default to the original path
-        rteb_data_path = kwargs.pop(
-            "rteb_data_path",
-            os.environ.get(
-                "RTEB_DATA_PATH",
-                "/Users/fodizoltan/Projects/toptal/voyageai/ebr-frank/data",
-            ),
-        )
-        super().__init__(
-            rteb_data_path=rteb_data_path, rteb_dataset_name="HumanEval", **kwargs
-        )
+        super().__init__(rteb_dataset_name="HumanEval", **kwargs)

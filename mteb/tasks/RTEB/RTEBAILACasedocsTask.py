@@ -1,4 +1,3 @@
-# Concrete RTEB task definition for AILACasedocs
 from __future__ import annotations
 
 import logging
@@ -17,10 +16,8 @@ class RTEBAILACasedocs(AbsTaskRTEB):
         reference="https://zenodo.org/records/4063986",
         dataset_path="mteb/AILA_casedocs",
         dataset_revision="4106e6bcc72e0698d714ea8b101355e3e238431a",
-        eval_langs=["eng-Latn"],
         main_score="ndcg_at_10",
-        revision="1.0.1",  # Increment revision for this refactoring
-        domains=["Legal", "Written"],
+        revision="1.0.1",
         task_subtypes=["Article retrieval"],
         license="cc-by-4.0",
         annotations_creators="derived",
