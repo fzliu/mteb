@@ -8,7 +8,6 @@ from typing import Any, Literal
 import numpy as np
 import torch
 from numpy import ndarray
-from typing import Union
 from sentence_transformers import CrossEncoder, SentenceTransformer
 from torch import Tensor
 from torch.utils.data import DataLoader
@@ -21,19 +20,23 @@ from tests.test_benchmark.task_grid import MOCK_TASK_TEST_GRID
 
 
 class MockNumpyEncoder(mteb.Encoder):
-    def __init__(self, normalize_embeddings: bool = False, is_pytorch_model: bool = False):
+    def __init__(
+        self, normalize_embeddings: bool = False, is_pytorch_model: bool = False
+    ):
         self.normalize_embeddings = normalize_embeddings
         self.is_pytorch_model = is_pytorch_model
         super().__init__()
 
-    def encode(self, sentences: list[str], prompt_name: str | None = None, **kwargs: Any) -> Union[np.ndarray, torch.Tensor]:  # type: ignore
+    def encode(
+        self, sentences: list[str], prompt_name: str | None = None, **kwargs: Any
+    ) -> np.ndarray | torch.Tensor:  # type: ignore
         # simple constant shape
         emb = np.ones((len(sentences), 10), dtype=np.float32)
         if self.normalize_embeddings:
             norm = np.linalg.norm(emb, axis=1, keepdims=True)
             # Avoid division by zero if norm is zero
             if np.any(norm == 0):
-                emb = np.zeros_like(emb) # Or handle as an error, or keep as is
+                emb = np.zeros_like(emb)  # Or handle as an error, or keep as is
             else:
                 emb = emb / norm
 
