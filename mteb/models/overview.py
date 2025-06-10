@@ -38,6 +38,7 @@ from mteb.models import (
     e5_v,
     evaclip_models,
     fa_models,
+    geogpt_models,
     gme_v_models,
     google_models,
     gritlm_models,
@@ -90,7 +91,6 @@ from mteb.models import (
     vlm2vec_models,
     voyage_models,
     voyage_v,
-    geogpt_models,
 )
 
 logger = logging.getLogger(__name__)
