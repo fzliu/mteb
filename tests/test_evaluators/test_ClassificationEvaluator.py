@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 import torch
 
+import mteb
 from mteb.evaluation.evaluators import (
     kNNClassificationEvaluator,
     kNNClassificationEvaluatorPytorch,
@@ -220,10 +221,18 @@ class TestKNNClassificationEvaluator:
                 assert "ap" not in scores
 
 
+class LocalMockTorchEncoder(mteb.Encoder):
+    def __init__(self):
+        pass
+
+    def encode(self, sentences, prompt_name: str | None = None, **kwargs):
+        return torch.randn(len(sentences), 10)
+
+
 class TestKNNClassificationEvaluatorPytorch:
     @pytest.fixture
     def model_pytorch(self):
-        return MockNumpyEncoder(is_pytorch_model=True)
+        return LocalMockTorchEncoder()
 
     @pytest.fixture
     def eval_pytorch_binary(self):
